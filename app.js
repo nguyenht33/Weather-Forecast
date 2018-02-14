@@ -1,7 +1,8 @@
 const geoKey = 'AIzaSyBi4p4_5i-BkoRSKAhOIzUyp9usQTqQitw';
 const geoURL = 'https://maps.googleapis.com/maps/api/geocode/json';
 const openKey = '335185afd1bee6c30739e6238eec798b';
-const openURL = 'https://api.openweathermap.org/data/2.5/weather';
+const openWeatherURL = 'https://api.openweathermap.org/data/2.5/weather';
+const openForecastURL = 'https://api.openweathermap.org/data/2.5/forecast';
 
 function getLocation(address) {
   let data = {
@@ -20,7 +21,7 @@ function getLocation(address) {
   });
 }
 
-function getCurrentWeather(lat, lon) {
+function getWeather(lat, lon) {
   let data = {
     lat: lat,
     lon: lon,
@@ -30,21 +31,36 @@ function getCurrentWeather(lat, lon) {
   $.ajax({
     type: 'GET',
     dataType: 'json',
-    url: openURL,
+    url: openWeatherURL,
     data: data,
     async: false,
     success: displayWeather
   });
 }
 
+function getForecast(lat, lon) {
+  let data = {
+    lat: lat,
+    lon: lon,
+    cnt: '5',
+    appid: openKey
+  };
+
+  $.ajax({
+    type: 'GET',
+    dataType: 'json',
+    url: openForecastURL,
+    data: data,
+    async: false,
+    success: displayForecast
+  });
+}
+
 function getCoordinates(location) {
   const lat = location.results[0].geometry.location.lat;
   const lon = location.results[0].geometry.location.lng;
-  getCurrentWeather(lat, lon);
-}
-
-function displayWeather(weather) {
-  console.log(weather);
+  getWeather(lat, lon);
+  getForecast(lat, lon)
 }
 
 function getLocationInput() {
@@ -54,6 +70,14 @@ function getLocationInput() {
     const address = locationTarget.val();
     getLocation(address);
   })
+}
+
+function displayWeather(weather) {
+  console.log(weather);
+}
+
+function displayForecast(forecast) {
+  console.log(forecast);
 }
 
 function init() {

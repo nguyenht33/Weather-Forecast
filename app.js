@@ -57,10 +57,13 @@ function getForecast(lat, lon) {
 }
 
 function getCoordinates(location) {
-  const lat = location.results[0].geometry.location.lat;
-  const lon = location.results[0].geometry.location.lng;
+  const latLocation = location.results[0].geometry.location.lat;
+  const lonLocation = location.results[0].geometry.location.lng;
+  const lat = parseFloat(latLocation);
+  const lon = parseFloat(lonLocation);
   getWeather(lat, lon);
-  getForecast(lat, lon)
+  getForecast(lat, lon);
+  displayMap(lat, lon)
 }
 
 function getLocationInput() {
@@ -69,6 +72,13 @@ function getLocationInput() {
     const locationTarget = $(event.currentTarget).find('.js-location-input');
     const address = locationTarget.val();
     getLocation(address);
+  });
+}
+
+function handleMapClick() {
+  // This will later be dynamic content displayWeather/Forecast
+  $('.see-map').on('click', function() {
+    // Show map
   })
 }
 
@@ -78,6 +88,31 @@ function displayWeather(weather) {
 
 function displayForecast(forecast) {
   console.log(forecast);
+}
+
+function displayMap(lat, lon) {
+  let osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18, 
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>' 
+  });
+
+  let clouds = L.OWM.clouds({showLegend: false, opacity: 0.5, appId: openKey});
+  let precipitation = L.OWM.precipitation({showLegend: false, opacity: 0.5, appId: openKey});
+  let pressure = L.OWM.pressure({showLegend: false, opacity: 0.5, appId: openKey});
+  let temp = L.OWM.temperature({showLegend: false, opacity: 0.5, appId: openKey});
+  let wind = L.OWM.wind({showLegend: false, opacity: 0.5, appId: openKey});
+
+  let map = L.map('map', { center: new L.LatLng(lat, lon), zoom: 10, layers: [osm] });
+  let baseMaps = { "OSM Standard": osm };
+  let overlayMaps = { 
+    "Clouds": clouds, 
+    "Precipitation": precipitation, 
+    "Pressure": pressure,
+    "Temp": temp,
+    "Wind": wind,
+  };
+  
+  let layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 }
 
 function init() {

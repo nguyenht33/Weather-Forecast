@@ -3,7 +3,7 @@ const geoURL = 'https://maps.googleapis.com/maps/api/geocode/json';
 const openKey = '335185afd1bee6c30739e6238eec798b';
 const openWeatherURL = 'https://api.openweathermap.org/data/2.5/weather';
 const openForecastURL = 'https://api.openweathermap.org/data/2.5/forecast';
-let currentLocation;
+let currentCity;
 let locationsList = [];
 
 function getLocation(address) {
@@ -19,16 +19,16 @@ function getLocation(address) {
     url: geoURL,
     data: data,
     async: false,
-    success: addLocations           
+    success: addLocation           
   });
 }
 
-function getWeather(lat, lon) {
+function getWeather() {
   let data = {
-    lat: lat,
-    lon: lon,
+    lat: currentCity.lat,
+    lon: currentCity.lon,
     units: 'imperial',
-    lang: "en",
+    lang: 'en',
     appid: openKey
   };
 
@@ -42,13 +42,13 @@ function getWeather(lat, lon) {
   });
 }
 
-function getForecast(lat, lon) {
+function getForecast() {
   let data = {
-    lat: lat,
-    lon: lon,
+    lat: currentCity.lat,
+    lon: currentCity.lon,
     cnt: '5',
     units: 'imperial',
-    lang: "en",
+    lang: 'en',
     appid: openKey
   };
 
@@ -62,6 +62,7 @@ function getForecast(lat, lon) {
   });
 }
 
+// get search input
 function handleAddLocation() {
   $('.js-location-form').on('submit', function(e) {
     e.preventDefault();
@@ -72,35 +73,88 @@ function handleAddLocation() {
   });
 }
 
-function addLocations(location) {
+// add location to list & local storage
+function addLocation(location) {
   const city = location.results[0].address_components[0].long_name;
   const lat = location.results[0].geometry.location.lat;
   const lon = location.results[0].geometry.location.lng;
+
+  // add locations to list & local storage
   locationsList.push({name: city, lat: lat, lon: lon});
+  addListToStorage();
 
-  displayLocations(locationsList);
+  // set newly added city as current city
+  if (locationsList.length) {
+    currentCity = locationsList[locationsList.length - 1];
+    addCurrentToStorage();
+  }
 
-  //for displaying purposes right now
-  getMap(lat, lon);
-  getWeather(lat, lon);
-  getForecast(lat, lon); 
+  displayLocationsList();
+  getWeatherReports(); 
 
   console.log(location);
   console.log(locationsList);
+  console.log(currentCity);
 }
 
-function displayLocations(location) {
-  const newCity = location.map(function(city) {
-    return `<li>
-              <p>${city.name}</p>
-              <button>x</button>
+// get locations from local storage
+function getFromLocalStorage() {
+  let storedLocations = localStorage.getItem('locationsLIST');
+  if (storedLocations !== null) {
+    let parsedLocations = JSON.parse(storedLocations);
+    locationsList = parsedLocations.slice(0);
+  }
+}
+
+// get current city from local storage
+function getCurrentFromStorage() {
+  let storedCurrent = localStorage.getItem('currentCITY');
+  if (storedCurrent !== null) {
+    let parsedCurrent = JSON.parse(storedCurrent);
+    currentCity = parsedCurrent.slice(0);
+  }
+}
+
+// copy locations list to local storage
+function addListToStorage() {
+  localStorage.setItem('locationsLIST', JSON.stringify(locationsList));
+}
+
+// copy current city to local storage
+function addCurrentToStorage() {
+  localStorage.setItem('currentCITY', JSON.stringify(currentCity));
+}
+
+// remove locations list from local storage
+function removeListFromStorage() {
+
+}
+
+// remove locations list from local storage
+function removeCurrentFromStorage() {
+
+}
+
+// display locations list ui
+function displayLocationsList() {
+  const cityItems = locationsList.map(function(city, index) {
+    return `<li id="city-index-${index}">
+              <p class="city">${city.name}</p>
+              <button class="delete">x</button>
             </li>`
   })
-  $('.js-cities').html(newCity);
+  $('.js-cities-list').html(cityItems);
 }
 
 function handleLocationClicked() {
-  // shows current weather of current location
+  $('.js-cities-list').on('click', 'li', function() {
+    const itemId = $(this).attr('id');
+    const itemIndex = itemId.replace(/\D/g,'');
+    
+    // make clicked city current city 
+    currentCity = locationsList[itemIndex];
+    addCurrentToStorage(currentCity);
+  });
 }
 
 function handleLocationDelete() {
@@ -115,13 +169,6 @@ function displayForecast(forecast) {
   console.log(forecast);
 }
 
-function handleMapClick() {
-  // This will later be dynamic content of displayWeather/Forecast
-  $('.see-map').on('click', function() {
-    // Show map
-  })
-}
-
 function getMap(lat, lon) {
   if (map != undefined || map != null) {
     map.remove();
@@ -129,7 +176,7 @@ function getMap(lat, lon) {
     $('#preMap').empty();
     $('<div id="map"></div>').appendTo('#preMap');
   } 
-  displayMap(lat, lon);
+  displayMap(currentCity.lat, currentCity.lon);
 }
 
 function displayMap(lat, lon) {
@@ -157,8 +204,17 @@ function displayMap(lat, lon) {
   let layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 }
 
+function getWeatherReports() {
+  getWeather();
+  getForecast();
+  getMap();
+}
+
 function init() {
   handleAddLocation();
+  handleLocationClicked()
+  getFromLocalStorage();
+  displayLocationsList();
 }
 
 $(init)

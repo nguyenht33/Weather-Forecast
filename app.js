@@ -62,7 +62,6 @@ function getForecast() {
   });
 }
 
-// get search input
 function handleAddLocation() {
   $('.js-location-form').on('submit', function(e) {
     e.preventDefault();
@@ -73,73 +72,52 @@ function handleAddLocation() {
   });
 }
 
-// add location to list & local storage
 function addLocation(location) {
   const city = location.results[0].address_components[0].long_name;
   const lat = location.results[0].geometry.location.lat;
   const lon = location.results[0].geometry.location.lng;
 
-  // add locations to list & local storage
   locationsList.push({name: city, lat: lat, lon: lon});
-  addListToStorage();
+  setListToStorage();
 
-  // set newly added city as current city
   if (locationsList.length) {
     currentCity = locationsList[locationsList.length - 1];
-    addCurrentToStorage();
+    setCurrentToStorage();
   }
 
   displayLocationsList();
-  getWeatherReports(); 
-
-  console.log(location);
-  console.log(locationsList);
-  console.log(currentCity);
+  displayWeatherReports(); 
 }
 
-// get locations from local storage
-function getFromLocalStorage() {
+
+function getListFromLocalStorage() {
   let storedLocations = localStorage.getItem('locationsLIST');
   if (storedLocations !== null) {
     let parsedLocations = JSON.parse(storedLocations);
     locationsList = parsedLocations.slice(0);
-  }
+  };
 }
 
-// get current city from local storage
 function getCurrentFromStorage() {
   let storedCurrent = localStorage.getItem('currentCITY');
   if (storedCurrent !== null) {
     let parsedCurrent = JSON.parse(storedCurrent);
-    currentCity = parsedCurrent.slice(0);
-  }
+    currentCity = parsedCurrent;
+  };
 }
 
-// copy locations list to local storage
-function addListToStorage() {
+function setListToStorage() {
   localStorage.setItem('locationsLIST', JSON.stringify(locationsList));
 }
 
-// copy current city to local storage
-function addCurrentToStorage() {
+function setCurrentToStorage() {
   localStorage.setItem('currentCITY', JSON.stringify(currentCity));
 }
 
-// remove locations list from local storage
-function removeListFromStorage() {
-
-}
-
-// remove locations list from local storage
-function removeCurrentFromStorage() {
-
-}
-
-// display locations list ui
 function displayLocationsList() {
   const cityItems = locationsList.map(function(city, index) {
-    return `<li id="city-index-${index}">
-              <p class="city">${city.name}</p>
+    return `<li id="${index}">
+              <p >${city.name}</p>
               <button class="delete">x</button>
             </li>`
   })
@@ -147,18 +125,28 @@ function displayLocationsList() {
 }
 
 function handleLocationClicked() {
-  $('.js-cities-list').on('click', 'li', function() {
-    const itemId = $(this).attr('id');
-    const itemIndex = itemId.replace(/\D/g,'');
-    
-    // make clicked city current city 
+  $('.js-cities-list').on('click', 'p', function() {
+    const itemIndex = $(this).closest('li').attr('id');
+   
     currentCity = locationsList[itemIndex];
-    addCurrentToStorage(currentCity);
+    setCurrentToStorage(currentCity);
+    displayWeatherReports();
   });
 }
 
 function handleLocationDelete() {
-  //remove location from list
+  $('.js-cities-list').on('click', '.delete', function() {
+    const itemIndex = $(this).closest('li').attr('id');
+    locationsList.splice(itemIndex, 1);
+    setListToStorage();
+    displayLocationsList();
+
+    if (locationsList.indexOf(currentCity) === -1) {
+      currentCity = locationsList[0];
+      setCurrentToStorage();
+      displayWeatherReports();
+    };
+  });
 }
 
 function displayWeather(weather) {
@@ -169,7 +157,7 @@ function displayForecast(forecast) {
   console.log(forecast);
 }
 
-function getMap(lat, lon) {
+function getMap() {
   if (map != undefined || map != null) {
     map.remove();
     $('#map').html('');
@@ -204,7 +192,14 @@ function displayMap(lat, lon) {
   let layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 }
 
-function getWeatherReports() {
+function displayWelcomeMessage() {
+  if (currentCity === undefined) {
+    // remove map
+    // display message telling user to add location
+  }
+}
+
+function displayWeatherReports() {
   getWeather();
   getForecast();
   getMap();
@@ -212,9 +207,12 @@ function getWeatherReports() {
 
 function init() {
   handleAddLocation();
-  handleLocationClicked()
-  getFromLocalStorage();
+  handleLocationClicked();
+  handleLocationDelete();
+  getListFromLocalStorage();
+  getCurrentFromStorage();
   displayLocationsList();
+  displayWeatherReports();
 }
 
 $(init)

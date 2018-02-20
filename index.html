@@ -2,18 +2,22 @@
 <html lang="en">
 <head>
 	<title>Forecast</title>
+	<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+	<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	<link rel="stylesheet" type="text/css" href="leaflet/leaflet.css">
-	<link rel="stylesheet" type="text/css" href="OWM/leaflet-openweathermap.css" />
+	<link rel="stylesheet" type="text/css" href="OWM/leaflet-openweathermap.css"/>
 </head>
 <body>		
 	<header>
-		<h1>Forecast</h1>
-		<ul class="js-cities-list"></ul>
+		<ul class="js-side-nav side-nav">
+			
+		</ul>
+		<span class="side-nav-trigger"><i class="fas fa-bars"></i></span>
 		<form action="#" class="js-location-form">
 		    <label for="location"></label>
-		    <input type="text" class="js-location-input" placeholder="Enter location">
-		    <button type="submit" id="submit">Search</button>
+		    <input type="text" class="js-location-input location-input" placeholder="Enter location">
+		    <span class="add-icon"><i class="fas fa-plus"></i></span>
 	    </form>
 	</header>
 

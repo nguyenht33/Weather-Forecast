@@ -6,6 +6,7 @@ const openForecastURL = 'https://api.openweathermap.org/data/2.5/forecast';
 let currentCity;
 let locationsList = [];
 
+// ajax functions //
 function getLocation(address) {
   let data = {
     address: address,
@@ -62,6 +63,7 @@ function getForecast() {
   });
 }
 
+// add items functions //
 function handleAddLocation() {
   $('.js-location-form').on('submit', function(e) {
     e.preventDefault();
@@ -89,7 +91,7 @@ function addLocation(location) {
   displayWeatherReports(); 
 }
 
-
+// local storage functions //
 function getListFromLocalStorage() {
   let storedLocations = localStorage.getItem('locationsLIST');
   if (storedLocations !== null) {
@@ -114,18 +116,9 @@ function setCurrentToStorage() {
   localStorage.setItem('currentCITY', JSON.stringify(currentCity));
 }
 
-function displayLocationsList() {
-  const cityItems = locationsList.map(function(city, index) {
-    return `<li id="${index}">
-              <p >${city.name}</p>
-              <button class="delete">x</button>
-            </li>`
-  })
-  $('.js-cities-list').html(cityItems);
-}
-
+// handle click functions //
 function handleLocationClicked() {
-  $('.js-cities-list').on('click', 'p', function() {
+  $('.js-side-nav').on('click', 'p', function() {
     const itemIndex = $(this).closest('li').attr('id');
    
     currentCity = locationsList[itemIndex];
@@ -135,7 +128,7 @@ function handleLocationClicked() {
 }
 
 function handleLocationDelete() {
-  $('.js-cities-list').on('click', '.delete', function() {
+  $('.js-side-nav').on('click', '.delete', function() {
     const itemIndex = $(this).closest('li').attr('id');
     locationsList.splice(itemIndex, 1);
     setListToStorage();
@@ -149,14 +142,56 @@ function handleLocationDelete() {
   });
 }
 
+// display functions //
+function displayWelcomeMessage() {
+  if (currentCity === undefined) {
+    // remove map
+    // display message telling user to add location
+  }
+}
+
+function displayLocationsList() {
+  const cityItems = locationsList.map(function(city, index) {
+    return `<li id="${index}" class="sidenav">
+              <div class="list-item">
+                <p>${city.name}</p>
+                <button class="delete">x</button>
+              </div>
+            </li>`
+  });
+  $('.js-side-nav').html(cityItems);
+}
+
 function displayWeather(weather) {
   console.log(weather);
+  const currentWeather = `<div class="city-name">
+                            <h2>${currentCity.name}<h2>
+                          </div>
+                          <div class="current-temp">
+                            <h1>${weather.main.temp}</h1>
+                            <p>${weather.main.temp_min} | ${weather.main.temp_max}</p>
+                          </div>
+                          <div class="current-weather">
+                            <h2>${weather.weather[0].description}</h2>
+                          </div>
+                          <div class="weather-details">
+                            <h2>DETAILS</h2>
+                            <ul>
+                              <li>Feels like: <span>${weather.main.temp}</span></li>
+                              <li>Humidity: <span>${weather.main.humidity}</span></li>
+                              <li>Wind: <span>${weather.wind.speed}m/s</span></li>
+                              <li>Visibility: <span>${weather.visibility}m</span></li>
+                            </ul>
+                          </div>`
+  $('.js-location-result').html(currentWeather);
 }
 
 function displayForecast(forecast) {
   console.log(forecast);
 }
 
+
+// map functions //
 function getMap() {
   if (map != undefined || map != null) {
     map.remove();
@@ -192,11 +227,18 @@ function displayMap(lat, lon) {
   let layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 }
 
-function displayWelcomeMessage() {
-  if (currentCity === undefined) {
-    // remove map
-    // display message telling user to add location
-  }
+
+function displaySideBar() {
+  $('.side-nav-trigger').click(function() {
+    $('.js-side-nav li').toggleClass('close');
+    $('.js-side-nav').removeClass('hide-nav');
+    $('.js-side-nav').addClass('show-nav');
+  });
+  $('.js-side-nav').on('click', '.close', function() {
+    $('.js-side-nav li').toggleClass('close');
+    $('.js-side-nav').removeClass('show-nav');
+    $('.js-side-nav').addClass('hide-nav');
+  });
 }
 
 function displayWeatherReports() {
@@ -213,6 +255,7 @@ function init() {
   getCurrentFromStorage();
   displayLocationsList();
   displayWeatherReports();
+  displaySideBar();
 }
 
 $(init)

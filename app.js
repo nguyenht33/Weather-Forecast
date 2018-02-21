@@ -163,7 +163,6 @@ function displayLocationsList() {
 }
 
 function displayWeather(weather) {
-  console.log(weather);
   const currentWeather = `<div class="city-name">
                             <h2>${currentCity.name}<h2>
                           </div>
@@ -183,11 +182,21 @@ function displayWeather(weather) {
                               <li>Visibility: <span>${weather.visibility}m</span></li>
                             </ul>
                           </div>`
-  $('.js-location-result').html(currentWeather);
+  $('.js-weather-results').html(currentWeather);
+}
+
+function displayForecast(dailyForecast) {
+  const template = dailyForecast.map(function(d) {
+    return  `<ul>
+                <li>${d.day}</li>
+                <li>${d.temp}&#176</li>
+            </ul>`;
+  });
+  $('.js-forecast-results').html(template);
+  $('.js-forecast-results').prepend(`<h2>Forecast</h2>`);
 }
 
 function generateForecast(forecast) {
-  console.log(forecast);
   const forecastObj = forecast.list;
   const forecastArray = [];
 
@@ -211,15 +220,14 @@ function generateForecast(forecast) {
     }
     forecastArray.push( {day: day, temp: temp, weather: weather} );
   }
-  console.log(forecastArray);
-  let daily = forecastArray.slice();
-  daily = getAverageTemp(forecastArray);
-  console.log(daily);
+
+  const dailyForecast = getAverageTemp(forecastArray);
+  displayForecast(dailyForecast);
 }
 
 function getAverageTemp(arr) {
-    var tempSums = {}, counts = {}, results = [], day;
-    for (var i = 0; i < arr.length; i++) {
+    let tempSums = {}, counts = {}, results = [], day;
+    for (let i = 0; i < arr.length; i++) {
         day = arr[i].day;
         if (!(day in tempSums)) {
           tempSums[day] = 0;
@@ -232,18 +240,8 @@ function getAverageTemp(arr) {
     for (day in tempSums) {
         results.push({ day: day, temp: Math.trunc(tempSums[day] / counts[day]) });
     }
-    return results;
-}
 
-function getForecastTemplate(day) {
-  return `<div class="forecast">
-            <h2>Forecast</h2>
-            <ul>
-              <li>${getDay(day.date)}</li>
-              <li>${day.temp}&#176</li>
-              <li>${day.tempMin}&#176</li>
-            </ul>
-          </div>`
+    return results;
 }
 
 

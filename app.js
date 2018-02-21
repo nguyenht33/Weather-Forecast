@@ -47,7 +47,7 @@ function getForecast() {
   let data = {
     lat: currentCity.lat,
     lon: currentCity.lon,
-    cnt: '5',
+    cnt: '40',
     units: 'imperial',
     lang: 'en',
     appid: openKey
@@ -59,7 +59,7 @@ function getForecast() {
     url: openForecastURL,
     data: data,
     async: false,
-    success: displayForecast
+    success: generateForecast
   });
 }
 
@@ -78,7 +78,7 @@ function addLocation(location) {
   const city = location.results[0].address_components[0].long_name;
   const lat = location.results[0].geometry.location.lat;
   const lon = location.results[0].geometry.location.lng;
-
+  console.log(location);
   locationsList.push({name: city, lat: lat, lon: lon});
   setListToStorage();
 
@@ -168,17 +168,17 @@ function displayWeather(weather) {
                             <h2>${currentCity.name}<h2>
                           </div>
                           <div class="current-temp">
-                            <h1>${weather.main.temp}</h1>
-                            <p>${weather.main.temp_min} | ${weather.main.temp_max}</p>
+                            <h1>${Math.trunc(weather.main.temp)}&#176</h1>
+                            <p>${Math.trunc(weather.main.temp_min)}&#176 | ${Math.trunc(weather.main.temp_max)}&#176</p>
                           </div>
                           <div class="current-weather">
                             <h2>${weather.weather[0].description}</h2>
                           </div>
                           <div class="weather-details">
-                            <h2>DETAILS</h2>
+                            <h2>Details</h2>
                             <ul>
-                              <li>Feels like: <span>${weather.main.temp}</span></li>
-                              <li>Humidity: <span>${weather.main.humidity}</span></li>
+                              <li>Feels like: <span>${Math.trunc(weather.main.temp)}&#176</span></li>
+                              <li>Humidity: <span>${weather.main.humidity}%</span></li>
                               <li>Wind: <span>${weather.wind.speed}m/s</span></li>
                               <li>Visibility: <span>${weather.visibility}m</span></li>
                             </ul>
@@ -186,8 +186,72 @@ function displayWeather(weather) {
   $('.js-location-result').html(currentWeather);
 }
 
-function displayForecast(forecast) {
+function generateForecast(forecast) {
   console.log(forecast);
+  const forecastObj = forecast.list;
+  const forecastArray = [];
+
+  for (let key in forecastObj) {
+    if (forecastObj.hasOwnProperty(key)) {
+      var day = getDay(forecastObj[key].dt_txt);
+      var main = forecastObj[key].main;
+      var weatherList = forecastObj[key].weather[0];
+
+      for (let i in main) {
+        if (main.hasOwnProperty(i)) {
+          var temp = main.temp;
+        }
+      }
+
+      for (let j in weatherList) {
+        if (weatherList.hasOwnProperty(j)) {
+          var weather = weatherList.main;
+        }
+      }
+    }
+    forecastArray.push( {day: day, temp: temp, weather: weather} );
+  }
+  console.log(forecastArray);
+  let daily = forecastArray.slice();
+  daily = getAverageTemp(forecastArray);
+  console.log(daily);
+}
+
+function getAverageTemp(arr) {
+    var tempSums = {}, counts = {}, results = [], day;
+    for (var i = 0; i < arr.length; i++) {
+        day = arr[i].day;
+        if (!(day in tempSums)) {
+          tempSums[day] = 0;
+          counts[day] = 0;
+        }
+        tempSums[day] += arr[i].temp;
+        counts[day]++;
+    }
+
+    for (day in tempSums) {
+        results.push({ day: day, temp: Math.trunc(tempSums[day] / counts[day]) });
+    }
+    return results;
+}
+
+function getForecastTemplate(day) {
+  return `<div class="forecast">
+            <h2>Forecast</h2>
+            <ul>
+              <li>${getDay(day.date)}</li>
+              <li>${day.temp}&#176</li>
+              <li>${day.tempMin}&#176</li>
+            </ul>
+          </div>`
+}
+
+
+function getDay(date) {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const d = new Date(date);
+  const dayday = days[d.getDay()];
+  return dayday;
 }
 
 
@@ -228,18 +292,18 @@ function displayMap(lat, lon) {
 }
 
 
-function displaySideBar() {
-  $('.side-nav-trigger').click(function() {
-    $('.js-side-nav li').toggleClass('close');
-    $('.js-side-nav').removeClass('hide-nav');
-    $('.js-side-nav').addClass('show-nav');
-  });
-  $('.js-side-nav').on('click', '.close', function() {
-    $('.js-side-nav li').toggleClass('close');
-    $('.js-side-nav').removeClass('show-nav');
-    $('.js-side-nav').addClass('hide-nav');
-  });
-}
+// function displaySideBar() {
+//   $('.side-nav-trigger').click(function() {
+//     $('.js-side-nav li').toggleClass('close');
+//     $('.js-side-nav').removeClass('hide-nav');
+//     $('.js-side-nav').addClass('show-nav');
+//   });
+//   $('.js-side-nav').on('click', '.close', function() {
+//     $('.js-side-nav li').toggleClass('close');
+//     $('.js-side-nav').removeClass('show-nav');
+//     $('.js-side-nav').addClass('hide-nav');
+//   });
+// }
 
 function displayWeatherReports() {
   getWeather();
@@ -255,7 +319,6 @@ function init() {
   getCurrentFromStorage();
   displayLocationsList();
   displayWeatherReports();
-  displaySideBar();
 }
 
 $(init)

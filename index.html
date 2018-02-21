@@ -8,21 +8,22 @@
 	<link rel="stylesheet" type="text/css" href="leaflet/leaflet.css">
 	<link rel="stylesheet" type="text/css" href="OWM/leaflet-openweathermap.css"/>
 </head>
-<body>		
-	<header>
-		<ul class="js-side-nav side-nav">
-			
-		</ul>
+<body>	
+	<nav class="sidebar">
+		<ul class="js-side-nav side-nav"></ul>
+	</nav>	
+		
 		<span class="side-nav-trigger"><i class="fas fa-bars"></i></span>
+
+
+	<main role="main">
 		<form action="#" class="js-location-form">
 		    <label for="location"></label>
 		    <input type="text" class="js-location-input location-input" placeholder="Enter location">
 		    <span class="add-icon"><i class="fas fa-plus"></i></span>
 	    </form>
-	</header>
-
-	<main role="main">
-	    <div class="js-location-result"></div>	 
+	    <div class="js-location-result"></div>
+	    <div class="js-forecast"></div>	 
 	    <div id="preMap"><div id="map"></div></div>
 	</main>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>

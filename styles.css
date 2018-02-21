@@ -15,7 +15,7 @@ body {
 	z-index: 2;
 }
 
-.side-nav {
+/*.side-nav {
 	height: 100%;
 	width: 0;
 	position: fixed;
@@ -59,4 +59,4 @@ body {
 .hide-nav {
 	width: 0;
 }
-
+*/

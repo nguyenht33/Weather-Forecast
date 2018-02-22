@@ -166,12 +166,14 @@ function displayLocationsList() {
 }
 
 function displayWeather(weather) {
+  const main = weather.main;
+  const windSpeed = getMph(weather.wind.speed);
   const currentWeather = `<div class="city-name">
                             <h2>${currentCity.name}<h2>
                           </div>
                           <div class="current-temp">
-                            <h1>${Math.trunc(weather.main.temp)}&#176F</h1>
-                            <p>${Math.trunc(weather.main.temp_min)}&#176 | ${Math.trunc(weather.main.temp_max)}&#176</p>
+                            <h1>${Math.trunc(main.temp)}&#176F</h1>
+                            <p>${Math.trunc(main.temp_min)}&#176 | ${Math.trunc(main.temp_max)}&#176</p>
                           </div>
                           <div class="current-weather">
                             <h2>${weather.weather[0].description}</h2>
@@ -179,9 +181,9 @@ function displayWeather(weather) {
                           <div class="weather-details">
                             <h2>Details</h2>
                             <ul>
-                              <li>Feels like: <span>${Math.trunc(weather.main.temp)}&#176</span></li>
-                              <li>Humidity: <span>${weather.main.humidity}%</span></li>
-                              <li>Wind: <span>${getMph(weather.wind.speed)} mph</span></li>
+                              <li>Feels like: <span>${getFeelsLike(main.temp, main.humidity, windSpeed)}&#176</span></li>
+                              <li>Humidity: <span>${main.humidity}%</span></li>
+                              <li>Wind: <span>${windSpeed} mph</span></li>
                               <li>Visibility: <span>${getMiles(weather.visibility)} mi</span></li>
                             </ul>
                           </div>`
@@ -201,8 +203,8 @@ function displayForecast(dailyForecast) {
   $('.js-forecast-results').prepend(`<h2>Forecast</h2>`);
 }
 
-function generateForecast(forecast) {
-  const forecastObj = forecast.list;
+function generateForecast(forecasts) {
+  const forecastObj = forecasts.list;
   const forecastArray = [];
 
   for (let key in forecastObj) {
@@ -216,7 +218,6 @@ function generateForecast(forecast) {
           var temp = main.temp;
         }
       }
-
       for (let j in weatherList) {
         if (weatherList.hasOwnProperty(j)) {
           var weather = weatherList.description;
@@ -322,6 +323,32 @@ function mostCommonOccurence(arr = []) {
   const max = Math.max(...values);
   
   return keys.find(key => totals[key] === max);
+}
+
+function getFeelsLike(temp, humidity, windSpeed) {
+  const heatIndex = getHeatIndex(temp, humidity);
+  const windChill = getWindChill(temp, windSpeed);
+
+  if (temp > 80) {
+    return heatIndex;
+  } else {
+    return windChill;
+  }
+}
+
+function getHeatIndex(temp, humidity) {
+  let T = temp, rh = humidity, heatIndex;
+  heatIndex = -42.379 + (2.04901523 * T) + (10.14333127 * rh) 
+           - (0.22475541 * T * rh) - (6.83783 * (Math.pow(10, -3)) * (Math.pow(T, 2))) 
+           - (5.481717 * (Math.pow(10, -2)) * (Math.pow(rh, 2))) + (1.22874 * (Math.pow(10, -3)) * (Math.pow(T, 2)) * rh)
+           + (8.5282 * (Math.pow(10, -4)) * T * (Math.pow(rh, 2))) - (1.99 * (Math.pow(10, -6)) * (Math.pow(T, 2)) * (Math.pow(rh, 2)));
+  return Math.round(heatIndex);
+}
+
+function getWindChill(temp, windSpeed) {
+  let T = temp, V = windSpeed, windChill;
+  windChill = 35.74 + (0.6215 * T) - 35.75 * (Math.pow(V, 0.16)) + (0.4275 * T) * (Math.pow(V, 0.16));
+  return Math.round(windChill);
 }
 
 function getDay(date) {

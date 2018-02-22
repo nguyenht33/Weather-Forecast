@@ -9,23 +9,34 @@
 	<link rel="stylesheet" type="text/css" href="OWM/leaflet-openweathermap.css"/>
 </head>
 <body>	
-	<nav class="sidebar">
+	<header>
+		<div class="bar-container">
+			<button class="js-sidebar-btn sidebar-btn">
+				<span></span>
+			</button>
+		</div>
+		<div class="form-container">		
+			<form action="#" class="js-location-form">
+			    <label for="location"></label>
+			    <input type="text" class="js-location-input location-input" placeholder="Add location">
+			</form>
+	    	<button class="add-btn"><i class='add-shape'></i></button>
+		</div>
+	</header>
+
+	<nav class="sidebar" role="navigation">
+		<h3>Your Locations</h3>
 		<ul class="js-side-nav side-nav"></ul>
 	</nav>	
-		
-		<span class="side-nav-trigger"><i class="fas fa-bars"></i></span>
-
 
 	<main role="main">
-		<form action="#" class="js-location-form">
-		    <label for="location"></label>
-		    <input type="text" class="js-location-input location-input" placeholder="Enter location">
-		    <span class="add-icon"><i class="fas fa-plus"></i></span>
-	    </form>
-	    <div class="js-weather-results"></div>
-	    <div class="js-forecast-results"></div>	 
-	    <div id="preMap"><div id="map"></div></div>
+		<div class="page-wrap">
+			<div class="js-weather-results weather-results"></div>
+		    <div class="js-forecast-results"></div>	 
+		    <div id="preMap"><div id="map"></div></div>
+		</div>
 	</main>
+
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="leaflet/leaflet-src.js"></script>
 	<script type="text/javascript" src="OWM/leaflet-openweathermap.js"></script>

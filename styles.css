@@ -5,58 +5,250 @@
 }
 
 body {
-	overflow-x: hidden;
 	font-family: 'Lato', sans-serif;
+	overflow-x: hidden;
+}
+
+header {
+	display: flex;
+	align-items: center;
+	position: fixed;
+	top: 0;
+	height: 45px;
+	width: 100%;
+	background-color: gainsboro;
+}
+
+.bar-container {
+	width: 10px;
+	position: fixed;
+	top: 0;
+}
+
+.form-container {
+	width: 100%;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.form-container button {
+	position: relative;
+	top: 0;
+	width: 35px;
+	height: 35px;
+	background-color: transparent;
+	margin-right: 10px;
+	border: none;
+	cursor: pointer;
+	z-index: 5;
+}
+
+.add-shape {
+	display:inline-block!important;
+	position:relative;
+	width:35px;
+	height:35px;
+	border-radius:100%;
+}
+
+.add-shape:before {
+	position:absolute;
+	content:'';
+	margin:auto;
+	width:calc(30px/11);
+	height:calc(30px/1);
+	background-color:#262626;
+	top:0;
+	bottom:0;
+	left:0;
+	right:0
+}
+
+.add-shape:after {
+	position:absolute;
+	content:'';
+	margin:auto;
+	width:calc(30px/1);
+	height:calc(30px/11);
+	background-color:#262626;
+	top:0;
+	bottom:0;
+	left:0;
+	right:0;
+}
+
+.location-input {
+	width: 200px;
+	height: 35px;
+	font-size: 15px;
+	padding-left: 8px;
+	background-color: white;
+	border: 1px solid gray;
+}
+
+.sidebar {
+	position: fixed;
+	top: 0;
+	left: -250px;
+	background-color: #262626;
+	width: 250px;
+	height: 100%;
+	transition: .3s;
+	z-index: 10;
+}
+
+.sidebar h3 {
+	display: flex;
+	justify-content: center;
+	padding: 12px;
+	border-bottom: 1px solid #404040;
+	font-size: 18px;
+	font-weight: 300;
+	text-transform: uppercase;
+	color: white;
+}
+
+.active {
+	left: 0px;
+}
+
+ul li {
+	list-style: none;
+}
+
+.list-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 15px;
+	color: #fff;
+	border-bottom: 1px solid rgba(0,0,0,.2);
+	cursor: pointer;
+}
+
+.list-item:hover {
+	background-color: #5299e0;
+}
+
+.list-item button {
+	color: white;
+	width: 30px;
+	height: 30px;
+	font-size: 15px;
+	background: none;
+	border: none;
+	cursor: pointer;
+}
+
+.list-item p{
+	cursor: pointer;
+}
+
+.fa-map-marker {
+	color: #B0B0B0;
+	padding-right: 5px;
+}
+
+.active-marker {
+	color: yellow;
+}
+
+.sidebar-btn {
+	position: absolute;
+	top: 5px;
+	right: -40px;
+	width: 40px;
+	height: 40px;
+	padding: 0 5px;
+	cursor: pointer;
+	background: none;
+	border: none;
+	outline: none;
+	z-index: 10;
+}
+
+.sidebar-btn span {
+	display: block;
+	width: 35px;
+	height: 3px;
+	background-color: #262626;
+	position: absolute;
+	top: 15px;
+	transition: .3s;
+}
+
+.sidebar-btn span:before {
+	content: '';
+	position: absolute;
+	top: -10px;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	background-color: #262626;
+	transition: .3s;
+}
+
+.sidebar-btn span:after {
+	content: '';
+	position: absolute;
+	top: 10px;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	background-color: #262626;
+	transition: .3s;
+}
+
+.sidebar-btn.toggle span {
+	background: transparent;
+}
+
+.sidebar-btn.toggle span:before {
+	top: 0;
+	transform: rotate(45deg);
+}
+
+.sidebar-btn.toggle span:after {
+	top: 0;
+	transform: rotate(-45deg);
+}
+
+.page-wrap {
+	width: 100%;
+	margin: 50px auto;
+	padding: 10px;
+}
+
+.slide-right {
+	margin-left: 250px;
+}
+
+.slide-left {
+	margin-right: 250px;
+}
+
+.hidden {
+	display: none;
+}
+
+main {
+	width: 100%;
+
+}
+
+.city-name {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 300px;
+}
+
+.current-temp h1 {
+	font-size: 40px;
 }
 
 #map {
 	height: 400px;
 	width: 400px;
-	z-index: 2;
+	z-index: 1;
 }
-
-/*.side-nav {
-	height: 100%;
-	width: 0;
-	position: fixed;
-	z-index: 10;
-	top: 0;
-	left: 0;
-	background-color: #111;
-	overflow-x: hidden;
-	transition: 0.5s;
-	padding-top: 1em;
-}
-
-.side-nav li {
-	padding: 8px 8px 8px 32px;
-	text-decoration: none;
-	color: #818181;
-    display: block;
-    transition: 0.3s;
-}
-
-.side-nav li.close:before {
-	content: 'x';
-}
-
-.side-nav li.close:before {
-	position: absolute;
-	top: 0;
-	right: 25px;
-	font-size: 36px;
-	margin-left: 50px;
-}
-
-.side-nav li:hover {
-	color: #f1f1f1;
-}
-
-.show-nav {
-	width: 250px;
-}
-
-.hide-nav {
-	width: 0;
-}
-*/

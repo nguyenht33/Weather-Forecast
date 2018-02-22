@@ -118,7 +118,7 @@ function setCurrentToStorage() {
 
 // handle click functions //
 function handleLocationClicked() {
-  $('.js-side-nav').on('click', 'p', function() {
+  $('.js-side-nav').on('click', 'li', function() {
     const itemIndex = $(this).closest('li').attr('id');
    
     currentCity = locationsList[itemIndex];
@@ -150,11 +150,14 @@ function displayWelcomeMessage() {
   }
 }
 
+function displayCurrentLocationMarker() {
+}
+
 function displayLocationsList() {
-  const cityItems = locationsList.map(function(city, index) {
+  const cityItems = locationsList.map((city, index) => {
     return `<li id="${index}" class="sidenav">
               <div class="list-item">
-                <p>${city.name}</p>
+                <p><i class="fas fa-map-marker"></i>${city.name}</p>
                 <button class="delete">x</button>
               </div>
             </li>`
@@ -167,7 +170,7 @@ function displayWeather(weather) {
                             <h2>${currentCity.name}<h2>
                           </div>
                           <div class="current-temp">
-                            <h1>${Math.trunc(weather.main.temp)}&#176</h1>
+                            <h1>${Math.trunc(weather.main.temp)}&#176F</h1>
                             <p>${Math.trunc(weather.main.temp_min)}&#176 | ${Math.trunc(weather.main.temp_max)}&#176</p>
                           </div>
                           <div class="current-weather">
@@ -178,18 +181,20 @@ function displayWeather(weather) {
                             <ul>
                               <li>Feels like: <span>${Math.trunc(weather.main.temp)}&#176</span></li>
                               <li>Humidity: <span>${weather.main.humidity}%</span></li>
-                              <li>Wind: <span>${weather.wind.speed}m/s</span></li>
-                              <li>Visibility: <span>${weather.visibility}m</span></li>
+                              <li>Wind: <span>${getMph(weather.wind.speed)} mph</span></li>
+                              <li>Visibility: <span>${getMiles(weather.visibility)} mi</span></li>
                             </ul>
                           </div>`
   $('.js-weather-results').html(currentWeather);
 }
 
 function displayForecast(dailyForecast) {
-  const template = dailyForecast.map(function(d) {
+  const template = dailyForecast.map(function(day) {
     return  `<ul>
-                <li>${d.day}</li>
-                <li>${d.temp}&#176</li>
+                <li>${day.day}</li>
+                <li>${day.temp}&#176</li>
+                <li>${day.icon}</li>
+                <li>${day.weather}</li>
             </ul>`;
   });
   $('.js-forecast-results').html(template);
@@ -214,44 +219,127 @@ function generateForecast(forecast) {
 
       for (let j in weatherList) {
         if (weatherList.hasOwnProperty(j)) {
-          var weather = weatherList.main;
+          var weather = weatherList.description;
+          var icon = weatherList.icon;
         }
       }
     }
-    forecastArray.push( {day: day, temp: temp, weather: weather} );
+    forecastArray.push( {day: day, temp: temp, weather: weather, icon: icon} );
   }
 
   const dailyForecast = getAverageTemp(forecastArray);
   displayForecast(dailyForecast);
 }
 
-function getAverageTemp(arr) {
-    let tempSums = {}, counts = {}, results = [], day;
-    for (let i = 0; i < arr.length; i++) {
-        day = arr[i].day;
-        if (!(day in tempSums)) {
-          tempSums[day] = 0;
-          counts[day] = 0;
-        }
-        tempSums[day] += arr[i].temp;
-        counts[day]++;
+function getAverageTemp(forecasts) {
+  let tempSums = {}, tempCounts = {}, day;
+  for (let i = 0; i < forecasts.length; i++) {
+    day = forecasts[i].day;
+    if (!(day in tempSums)) {
+      tempSums[day] = 0;
+      tempCounts[day] = 0;
     }
+    tempSums[day] += forecasts[i].temp;
+    tempCounts[day]++;
+  }
+  const commonWeather = mostCommonWeatherByDay(forecasts);
+  const commonIcon = mostCommonIconByDay(forecasts);
+  const results = concatAverageForecasts(tempSums, tempCounts, commonWeather, commonIcon);
 
-    for (day in tempSums) {
-        results.push({ day: day, temp: Math.trunc(tempSums[day] / counts[day]) });
-    }
-
-    return results;
+  return results;
 }
 
+function concatAverageForecasts(temp, tempCount, weather, icon) {
+  const tempResults = [], weatherResults = [], iconResults = [], firstResults = [], finalResults = [];
+
+  for (day in temp) {
+    tempResults.push({ day: day, temp: Math.trunc(temp[day] / tempCount[day]) });
+  }
+  for (day in weather) {
+    weatherResults.push({ day: day, weather: weather[day] });
+  }
+  for (day in icon) {
+    iconResults.push({ day: day, icon: icon[day] });
+  }
+
+  tempResults.forEach((item, i) => {
+      firstResults.push(Object.assign({}, item, weatherResults[i]));
+  });
+  firstResults.forEach((item, i) => {
+    finalResults.push(Object.assign({}, item, iconResults[i]));
+  });
+
+  return finalResults;
+}
+
+function mostCommonWeatherByDay(data) {
+  const valuesByDay = data.reduce((acc, value) => {
+    const { day, temp, weather, icon } = value;
+    
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(weather);
+    return acc;
+  }, {})
+  
+  const ret = Object.keys(valuesByDay).reduce((acc, key) => {
+    acc[key] = mostCommonOccurence(valuesByDay[key]);
+    return acc;
+  }, {})
+  
+  return ret;
+}
+
+function mostCommonIconByDay(data) {
+  const valuesByDay = data.reduce((acc, value) => {
+    const { day, temp, weather, icon } = value;
+    
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(icon);
+    return acc;
+  }, {})
+  
+  const ret = Object.keys(valuesByDay).reduce((acc, key) => {
+    acc[key] = mostCommonOccurence(valuesByDay[key]);
+    return acc;
+  }, {})
+  
+  return ret;
+}
+
+function mostCommonOccurence(arr = []) {
+  const totals = arr.reduce((acc, val) => {
+    if (!acc[val]) {
+      acc[val] = 1; 
+      return acc; 
+    }
+    
+    acc[val] += 1;
+    return acc;
+  }, {});
+  
+  const keys = Object.keys(totals)
+  const values = keys.map(name => totals[name]);
+  const max = Math.max(...values);
+  
+  return keys.find(key => totals[key] === max);
+}
 
 function getDay(date) {
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const d = new Date(date);
-  const dayday = days[d.getDay()];
-  return dayday;
+  const dayResult = days[d.getDay()];
+  return dayResult;
 }
 
+function getMiles(meter) {
+  const miles = meter*0.000621371192;
+  return Math.round(( miles * 10 ) / 10).toFixed(1);
+}
+
+function getMph(meter) {
+  const miles = meter / 0.44704;
+  return Math.round(( miles * 10 ) / 10).toFixed(1);
+}
 
 // map functions //
 function getMap() {
@@ -289,19 +377,15 @@ function displayMap(lat, lon) {
   let layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 }
 
-
-// function displaySideBar() {
-//   $('.side-nav-trigger').click(function() {
-//     $('.js-side-nav li').toggleClass('close');
-//     $('.js-side-nav').removeClass('hide-nav');
-//     $('.js-side-nav').addClass('show-nav');
-//   });
-//   $('.js-side-nav').on('click', '.close', function() {
-//     $('.js-side-nav li').toggleClass('close');
-//     $('.js-side-nav').removeClass('show-nav');
-//     $('.js-side-nav').addClass('hide-nav');
-//   });
-// }
+function displaySidebar() {
+  $('.js-sidebar-btn').click(function() {
+    $('.sidebar').toggleClass('active');
+    $('.js-sidebar-btn').toggleClass('toggle');
+    $('.page-wrap').toggleClass('slide-right');
+    $('header').toggleClass('slide-right');
+    $('.form-container').toggleClass('hidden');
+  })
+}
 
 function displayWeatherReports() {
   getWeather();
@@ -317,6 +401,7 @@ function init() {
   getCurrentFromStorage();
   displayLocationsList();
   displayWeatherReports();
+  displaySidebar();
 }
 
 $(init)

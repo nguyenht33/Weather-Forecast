@@ -1,3 +1,92 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?ti69t3');
+  src:  url('fonts/icomoon.eot?ti69t3#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?ti69t3') format('truetype'),
+    url('fonts/icomoon.woff?ti69t3') format('woff'),
+    url('fonts/icomoon.svg?ti69t3#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-sunrise:before {
+  content: "\e912";
+}
+.icon-sunset:before {
+  content: "\e913";
+}
+.icon-01d:before {
+  content: "\e900";
+}
+.icon-01n:before {
+  content: "\e901";
+}
+.icon-02d:before {
+  content: "\e902";
+}
+.icon-02n:before {
+  content: "\e903";
+}
+.icon-03d:before {
+  content: "\e904";
+}
+.icon-03n:before {
+  content: "\e905";
+}
+.icon-04d:before {
+  content: "\e906";
+}
+.icon-04n:before {
+  content: "\e907";
+}
+.icon-09d:before {
+  content: "\e908";
+}
+.icon-09n:before {
+  content: "\e909";
+}
+.icon-10d:before {
+  content: "\e90a";
+}
+.icon-10n:before {
+  content: "\e90b";
+}
+.icon-11d:before {
+  content: "\e90c";
+}
+.icon-11n:before {
+  content: "\e90d";
+}
+.icon-13d:before {
+  content: "\e90e";
+}
+.icon-13n:before {
+  content: "\e90f";
+}
+.icon-50d:before {
+  content: "\e910";
+}
+.icon-50n:before {
+  content: "\e911";
+}
+
+/*page styles*/
+
 * {
 	box-sizing: border-box;
 	padding: 0;
@@ -215,7 +304,7 @@ ul li {
 }
 
 .page-wrap {
-	width: 100%;
+	width: 500px;
 	margin: 50px auto;
 	padding: 10px;
 }
@@ -244,11 +333,43 @@ main {
 }
 
 .current-temp h1 {
-	font-size: 40px;
+	font-size: 60px;
 }
+
+.current-temp p {
+	font-size: 30px;
+}
+
+.current-weather-icon {
+	font-size: 60px;
+}
+
+.current-weather-container {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+	padding: 15px;
+	background-color: gainsboro;
+}
+
+.current-weather {
+	display: flex;
+	width: 20%;
+	margin: 0 auto;
+	border-right: 1px dotted black;
+}
+
+.weather-details {
+	width: 70%;
+}
+
+
+
+
 
 #map {
 	height: 400px;
 	width: 400px;
 	z-index: 1;
 }
+

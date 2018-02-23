@@ -150,6 +150,16 @@ function displayWelcomeMessage() {
   }
 }
 
+function displaySidebar() {
+  $('.js-sidebar-btn').click(function() {
+    $('.sidebar').toggleClass('active');
+    $('.js-sidebar-btn').toggleClass('toggle');
+    $('.page-wrap').toggleClass('slide-right');
+    $('header').toggleClass('slide-right');
+    $('.form-container').toggleClass('hidden');
+  })
+}
+
 function displayCurrentLocationMarker() {
 }
 
@@ -175,17 +185,20 @@ function displayWeather(weather) {
                             <h1>${Math.trunc(main.temp)}&#176F</h1>
                             <p>${Math.trunc(main.temp_min)}&#176 | ${Math.trunc(main.temp_max)}&#176</p>
                           </div>
-                          <div class="current-weather">
-                            <h2>${weather.weather[0].description}</h2>
-                          </div>
-                          <div class="weather-details">
-                            <h2>Details</h2>
-                            <ul>
-                              <li>Feels like: <span>${getFeelsLike(main.temp, main.humidity, windSpeed)}&#176</span></li>
-                              <li>Humidity: <span>${main.humidity}%</span></li>
-                              <li>Wind: <span>${windSpeed} mph</span></li>
-                              <li>Visibility: <span>${getMiles(weather.visibility)} mi</span></li>
-                            </ul>
+                          <div class="current-weather-container">
+                            <div class="current-weather">
+                              <span data-icon="&#xe001;" class="icon-${weather.weather[0].icon} current-weather-icon"></span>
+                              <h3>${weather.weather[0].description}</h3>
+                            </div>
+                            <div class="weather-details">
+                              <h2>Details</h2>
+                              <ul>
+                                <li>Feels like: <span>${getFeelsLike(main.temp, main.humidity, windSpeed)}&#176</span></li>
+                                <li>Humidity: <span>${main.humidity}%</span></li>
+                                <li>Wind: <span>${windSpeed} mph</span></li>
+                                <li>Visibility: <span>${getMiles(weather.visibility)} mi</span></li>
+                              </ul>
+                            </div>
                           </div>`
   $('.js-weather-results').html(currentWeather);
 }
@@ -195,7 +208,10 @@ function displayForecast(dailyForecast) {
     return  `<ul>
                 <li>${day.day}</li>
                 <li>${day.temp}&#176</li>
-                <li>${day.icon}</li>
+                <li>
+                  <p>${day.icon}</p>
+                  <span data-icon="&#xe001;" class="icon-${day.icon} forecast-icon"></span>
+                </li>
                 <li>${day.weather}</li>
             </ul>`;
   });
@@ -203,10 +219,12 @@ function displayForecast(dailyForecast) {
   $('.js-forecast-results').prepend(`<h2>Forecast</h2>`);
 }
 
+// calculating 5 days forecast based on OWM's every 3hrs data //
 function generateForecast(forecasts) {
   const forecastObj = forecasts.list;
   const forecastArray = [];
 
+  // loop thru JSON data to pull data of day, temp, weather & icon
   for (let key in forecastObj) {
     if (forecastObj.hasOwnProperty(key)) {
       var day = getDay(forecastObj[key].dt_txt);
@@ -232,6 +250,7 @@ function generateForecast(forecasts) {
   displayForecast(dailyForecast);
 }
 
+// get average temp from 5-days forecast array
 function getAverageTemp(forecasts) {
   let tempSums = {}, tempCounts = {}, day;
   for (let i = 0; i < forecasts.length; i++) {
@@ -243,13 +262,15 @@ function getAverageTemp(forecasts) {
     tempSums[day] += forecasts[i].temp;
     tempCounts[day]++;
   }
+
   const commonWeather = mostCommonWeatherByDay(forecasts);
   const commonIcon = mostCommonIconByDay(forecasts);
   const results = concatAverageForecasts(tempSums, tempCounts, commonWeather, commonIcon);
-
+  
   return results;
 }
 
+// concat results 
 function concatAverageForecasts(temp, tempCount, weather, icon) {
   const tempResults = [], weatherResults = [], iconResults = [], firstResults = [], finalResults = [];
 
@@ -273,6 +294,7 @@ function concatAverageForecasts(temp, tempCount, weather, icon) {
   return finalResults;
 }
 
+// find most common weather pattern by day
 function mostCommonWeatherByDay(data) {
   const valuesByDay = data.reduce((acc, value) => {
     const { day, temp, weather, icon } = value;
@@ -290,6 +312,7 @@ function mostCommonWeatherByDay(data) {
   return ret;
 }
 
+// find most common icon by day
 function mostCommonIconByDay(data) {
   const valuesByDay = data.reduce((acc, value) => {
     const { day, temp, weather, icon } = value;
@@ -307,6 +330,7 @@ function mostCommonIconByDay(data) {
   return ret;
 }
 
+// find most occurences & single them out
 function mostCommonOccurence(arr = []) {
   const totals = arr.reduce((acc, val) => {
     if (!acc[val]) {
@@ -325,6 +349,7 @@ function mostCommonOccurence(arr = []) {
   return keys.find(key => totals[key] === max);
 }
 
+// math calculations //
 function getFeelsLike(temp, humidity, windSpeed) {
   const heatIndex = getHeatIndex(temp, humidity);
   const windChill = getWindChill(temp, windSpeed);
@@ -404,16 +429,6 @@ function displayMap(lat, lon) {
   let layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 }
 
-function displaySidebar() {
-  $('.js-sidebar-btn').click(function() {
-    $('.sidebar').toggleClass('active');
-    $('.js-sidebar-btn').toggleClass('toggle');
-    $('.page-wrap').toggleClass('slide-right');
-    $('header').toggleClass('slide-right');
-    $('.form-container').toggleClass('hidden');
-  })
-}
-
 function displayWeatherReports() {
   getWeather();
   getForecast();
@@ -425,7 +440,7 @@ function init() {
   handleLocationClicked();
   handleLocationDelete();
   getListFromLocalStorage();
-  getCurrentFromStorage();
+  // getCurrentFromStorage();
   displayLocationsList();
   displayWeatherReports();
   displaySidebar();

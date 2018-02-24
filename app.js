@@ -78,7 +78,7 @@ function addLocation(location) {
   const city = location.results[0].address_components[0].long_name;
   const lat = location.results[0].geometry.location.lat;
   const lon = location.results[0].geometry.location.lng;
-  console.log(location);
+  
   locationsList.push({name: city, lat: lat, lon: lon});
   setListToStorage();
 
@@ -102,7 +102,9 @@ function getListFromLocalStorage() {
 
 function getCurrentFromStorage() {
   let storedCurrent = localStorage.getItem('currentCITY');
-  if (storedCurrent !== null) {
+  console.log(storedCurrent, typeof storedCurrent);
+  if (storedCurrent !== 'undefined' && storedCurrent !== null) {
+    console.log(storedCurrent, typeof storedCurrent);
     let parsedCurrent = JSON.parse(storedCurrent);
     currentCity = parsedCurrent;
   };
@@ -150,6 +152,7 @@ function displayWelcomeMessage() {
   }
 }
 
+
 function displaySidebar() {
   $('.js-sidebar-btn').click(function() {
     $('.sidebar').toggleClass('active');
@@ -157,6 +160,7 @@ function displaySidebar() {
     $('.page-wrap').toggleClass('slide-right');
     $('header').toggleClass('slide-right');
     $('.form-container').toggleClass('hidden');
+    $('.js-city-container').toggleClass('slide-left');
   })
 }
 
@@ -178,41 +182,35 @@ function displayLocationsList() {
 function displayWeather(weather) {
   const main = weather.main;
   const windSpeed = getMph(weather.wind.speed);
-  const currentWeather = `<div class="city-name">
-                            <h2>${currentCity.name}<h2>
-                          </div>
-                          <div class="current-temp">
+  const currentWeather = `<div class="current-temp">
                             <h1>${Math.trunc(main.temp)}&#176F</h1>
                             <p>${Math.trunc(main.temp_min)}&#176 | ${Math.trunc(main.temp_max)}&#176</p>
-                          </div>
+                          </div>                            
+                          
                           <div class="current-weather-container">
                             <div class="current-weather">
                               <span data-icon="&#xe001;" class="icon-${weather.weather[0].icon} current-weather-icon"></span>
                               <h3>${weather.weather[0].description}</h3>
                             </div>
                             <div class="weather-details">
-                              <h2>Details</h2>
                               <ul>
-                                <li>Feels like: <span>${getFeelsLike(main.temp, main.humidity, windSpeed)}&#176</span></li>
-                                <li>Humidity: <span>${main.humidity}%</span></li>
-                                <li>Wind: <span>${windSpeed} mph</span></li>
-                                <li>Visibility: <span>${getMiles(weather.visibility)} mi</span></li>
+                                <li><p>Feels like:</p><span>${getFeelsLike(main.temp, main.humidity, windSpeed)}&#176</span></li>
+                                <li><p>Humidity:</p><span>${main.humidity}%</span></li>
+                                <li><p>Wind:</p><span>${windSpeed} mph</span></li>
+                                <li><p>Visibility:</p><span>${getMiles(weather.visibility)} mi</span></li>
                               </ul>
                             </div>
-                          </div>`
+                          </div>`;
+  const cityName = `<h2>${currentCity.name}<h2>`;
   $('.js-weather-results').html(currentWeather);
+  $('.js-city-container').html(cityName);
 }
 
 function displayForecast(dailyForecast) {
   const template = dailyForecast.map(function(day) {
     return  `<ul>
                 <li>${day.day}</li>
-                <li>${day.temp}&#176</li>
-                <li>
-                  <p>${day.icon}</p>
-                  <span data-icon="&#xe001;" class="icon-${day.icon} forecast-icon"></span>
-                </li>
-                <li>${day.weather}</li>
+                <li><span data-icon="&#xe001;" class="icon-${day.icon} forecast-icon"></span>${day.temp}&#176</li>
             </ul>`;
   });
   $('.js-forecast-results').html(template);
@@ -440,7 +438,7 @@ function init() {
   handleLocationClicked();
   handleLocationDelete();
   getListFromLocalStorage();
-  // getCurrentFromStorage();
+  getCurrentFromStorage();
   displayLocationsList();
   displayWeatherReports();
   displaySidebar();

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	
 	<title>Forecast</title>
-	<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
 	<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	<link rel="stylesheet" type="text/css" href="leaflet/leaflet.css">
@@ -15,12 +17,15 @@
 				<span></span>
 			</button>
 		</div>
+		<div class="js-city-container city-container">
+			
+		</div>
 		<div class="form-container">		
 			<form action="#" class="js-location-form">
 			    <label for="location"></label>
 			    <input type="text" class="js-location-input location-input" placeholder="Add location">
 			</form>
-	    	<button class="add-btn"><i class='add-shape'></i></button>
+	    	<button class="add-btn js-add-btn"><i class='add-shape'></i></button>
 		</div>
 	</header>
 

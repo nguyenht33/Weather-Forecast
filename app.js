@@ -7,6 +7,23 @@ let currentCity;
 let locationsList = [];
 
 // ajax functions //
+function getReverseLocation(latlng) {
+    let data = {
+    latlng: latlng,
+    location_type: "APPROXIMATE",
+    key: geoKey
+  };
+
+  $.ajax({
+    type: 'GET',
+    dataType: 'json',
+    url: geoURL,
+    data: data,
+    async: false,
+    success: addCurrentLocation       
+  });
+}
+
 function getLocation(address) {
   let data = {
     address: address,
@@ -63,6 +80,132 @@ function getForecast() {
   });
 }
 
+function init() {
+  // checkLocalStatus();
+  getListFromLocalStorage();
+  getCurrentFromStorage();
+  displaySidebar();
+  handleAddLocation();
+  handleLocationClicked();
+  handleLocationDelete();
+  displayLocationsList();
+  
+}
+
+// function checkLocalStatus() {
+//   if (locationsList) {
+//     getListFromLocalStorage();
+//     getCurrentFromStorage();
+//   } else {
+//     getGeoLocation();
+//   }
+// }
+
+// local storage functions //
+function getListFromLocalStorage() {
+  let storedLocations = localStorage.getItem('locationsLIST');
+  if (storedLocations !== null) {
+    let parsedLocations = JSON.parse(storedLocations);
+    locationsList = parsedLocations.slice(0);
+  } else {
+    getGeoLocation();
+  };
+}
+
+function getCurrentFromStorage() {
+  let storedCurrent = localStorage.getItem('currentCITY');
+  if (storedCurrent !== 'undefined' && storedCurrent !== null) {
+    let parsedCurrent = JSON.parse(storedCurrent);
+    currentCity = parsedCurrent;
+    displayWeatherReports();
+  } else {
+    geolocation();
+  }
+}
+
+function displayWeatherReports() {
+  getWeather();
+  getForecast();
+  getMap();
+}
+
+function getGeoLocation() {
+  if (!navigator.geolocation) {
+    return getDefaultCity();
+  } 
+
+  function success(position) {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    const latlng = lat + ' '+ lon;
+    getReverseLocation(latlng);
+  }
+
+  function error() {
+    getDefaultCity();
+  }
+
+  navigator.geolocation.getCurrentPosition(success, error);
+}
+
+function getDefaultCity() {
+  const lat = 40.7127753;
+  const lon = -74.0059728;    
+  const latlng = lat + ' '+ lon;
+  getReverseLocation(latlng);
+}
+
+function addCurrentLocation(location) {
+  const city = location.results[0].address_components[0].long_name;
+  const lat = location.results[0].geometry.location.lat;
+  const lon = location.results[0].geometry.location.lng;
+
+  locationsList.push({name: city, lat: lat, lon: lon});
+  setListToStorage();
+
+  if (locationsList.length) {
+    currentCity = locationsList[locationsList.length - 1];
+
+    if (currentCity !== undefined) {
+      setCurrentToStorage();
+    }; 
+  };
+
+  displayLocationsList();
+  displayWeatherReports();
+}
+
+// add name & coordinates to global objects currentCity & locationList
+function addLocation(location) {
+  const city = location.results[0].address_components[0].long_name;
+  const lat = location.results[0].geometry.location.lat;
+  const lon = location.results[0].geometry.location.lng;
+ 
+  locationsList.push({name: city, lat: lat, lon: lon});
+  setListToStorage();
+
+  if (locationsList.length) {
+     currentCity = locationsList[locationsList.length - 1];
+
+     if (currentCity !== undefined) {
+       setCurrentToStorage();
+     }; 
+  };
+
+   displayLocationsList();
+   displayWeatherReports(); 
+ }
+
+function setListToStorage() {
+  localStorage.setItem('locationsLIST', JSON.stringify(locationsList));
+}
+
+function setCurrentToStorage() {
+  if (currentCity) {
+    localStorage.setItem('currentCITY', JSON.stringify(currentCity));
+  } 
+}
+
 // add items functions //
 function handleAddLocation() {
   $('.js-location-form').on('submit', function(e) {
@@ -74,49 +217,6 @@ function handleAddLocation() {
   });
 }
 
-function addLocation(location) {
-  const city = location.results[0].address_components[0].long_name;
-  const lat = location.results[0].geometry.location.lat;
-  const lon = location.results[0].geometry.location.lng;
-  
-  locationsList.push({name: city, lat: lat, lon: lon});
-  setListToStorage();
-
-  if (locationsList.length) {
-    currentCity = locationsList[locationsList.length - 1];
-    setCurrentToStorage();
-  }
-
-  displayLocationsList();
-  displayWeatherReports(); 
-}
-
-// local storage functions //
-function getListFromLocalStorage() {
-  let storedLocations = localStorage.getItem('locationsLIST');
-  if (storedLocations !== null) {
-    let parsedLocations = JSON.parse(storedLocations);
-    locationsList = parsedLocations.slice(0);
-  };
-}
-
-function getCurrentFromStorage() {
-  let storedCurrent = localStorage.getItem('currentCITY');
-  console.log(storedCurrent, typeof storedCurrent);
-  if (storedCurrent !== 'undefined' && storedCurrent !== null) {
-    console.log(storedCurrent, typeof storedCurrent);
-    let parsedCurrent = JSON.parse(storedCurrent);
-    currentCity = parsedCurrent;
-  };
-}
-
-function setListToStorage() {
-  localStorage.setItem('locationsLIST', JSON.stringify(locationsList));
-}
-
-function setCurrentToStorage() {
-  localStorage.setItem('currentCITY', JSON.stringify(currentCity));
-}
 
 // handle click functions //
 function handleLocationClicked() {
@@ -136,22 +236,28 @@ function handleLocationDelete() {
     setListToStorage();
     displayLocationsList();
 
-    if (locationsList.indexOf(currentCity) === -1) {
+    if (locationsList.length > 0) {
+      alert('no location');
+      getGeoLocation();
+    } else if (locationsList.indexOf(currentCity) === -1) {
       currentCity = locationsList[0];
       setCurrentToStorage();
       displayWeatherReports();
-    };
+    } 
+
   });
 }
 
-// display functions //
-function displayWelcomeMessage() {
-  if (currentCity === undefined) {
-    // remove map
-    // display message telling user to add location
-  }
-}
+// // display functions //
+// function displayWelcomeMessage() {
+//   if (currentCity === undefined) {
+//     // remove map
+//     // display message telling user to add location
+//   }
+// }
 
+// function displayCurrentLocationMarker() {
+// }
 
 function displaySidebar() {
   $('.js-sidebar-btn').click(function() {
@@ -162,9 +268,6 @@ function displaySidebar() {
     $('.form-container').toggleClass('hidden');
     $('.js-city-container').toggleClass('slide-left');
   })
-}
-
-function displayCurrentLocationMarker() {
 }
 
 function displayLocationsList() {
@@ -427,21 +530,8 @@ function displayMap(lat, lon) {
   let layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 }
 
-function displayWeatherReports() {
-  getWeather();
-  getForecast();
-  getMap();
-}
 
-function init() {
-  handleAddLocation();
-  handleLocationClicked();
-  handleLocationDelete();
-  getListFromLocalStorage();
-  getCurrentFromStorage();
-  displayLocationsList();
-  displayWeatherReports();
-  displaySidebar();
-}
+
+
 
 $(init)

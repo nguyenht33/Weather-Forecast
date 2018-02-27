@@ -10,7 +10,7 @@ let locationsList = [];
 function getReverseLocation(latlng) {
     let data = {
     latlng: latlng,
-    location_type: "APPROXIMATE",
+    result_type: 'locality',
     key: geoKey
   };
 
@@ -20,7 +20,7 @@ function getReverseLocation(latlng) {
     url: geoURL,
     data: data,
     async: false,
-    success: addCurrentLocation       
+    success: addLocation       
   });
 }
 
@@ -80,28 +80,18 @@ function getForecast() {
   });
 }
 
+// start app
 function init() {
-  // checkLocalStatus();
   getListFromLocalStorage();
   getCurrentFromStorage();
   displaySidebar();
   handleAddLocation();
   handleLocationClicked();
   handleLocationDelete();
-  displayLocationsList();
-  
+  displayLocationsList(); 
 }
 
-// function checkLocalStatus() {
-//   if (locationsList) {
-//     getListFromLocalStorage();
-//     getCurrentFromStorage();
-//   } else {
-//     getGeoLocation();
-//   }
-// }
-
-// local storage functions //
+// get city list from previous session if it exists
 function getListFromLocalStorage() {
   let storedLocations = localStorage.getItem('locationsLIST');
   if (storedLocations !== null) {
@@ -112,6 +102,7 @@ function getListFromLocalStorage() {
   };
 }
 
+// get current displaying city from previous session if it exists
 function getCurrentFromStorage() {
   let storedCurrent = localStorage.getItem('currentCITY');
   if (storedCurrent !== 'undefined' && storedCurrent !== null) {
@@ -123,12 +114,14 @@ function getCurrentFromStorage() {
   }
 }
 
+// make request calls for weather, forecast & map
 function displayWeatherReports() {
   getWeather();
   getForecast();
   getMap();
 }
 
+// ask user's permission for their location
 function getGeoLocation() {
   if (!navigator.geolocation) {
     return getDefaultCity();
@@ -148,6 +141,7 @@ function getGeoLocation() {
   navigator.geolocation.getCurrentPosition(success, error);
 }
 
+// input New York City as default if user denies geolocation
 function getDefaultCity() {
   const lat = 40.7127753;
   const lon = -74.0059728;    
@@ -155,28 +149,9 @@ function getDefaultCity() {
   getReverseLocation(latlng);
 }
 
-function addCurrentLocation(location) {
-  const city = location.results[0].address_components[0].long_name;
-  const lat = location.results[0].geometry.location.lat;
-  const lon = location.results[0].geometry.location.lng;
-
-  locationsList.push({name: city, lat: lat, lon: lon});
-  setListToStorage();
-
-  if (locationsList.length) {
-    currentCity = locationsList[locationsList.length - 1];
-
-    if (currentCity !== undefined) {
-      setCurrentToStorage();
-    }; 
-  };
-
-  displayLocationsList();
-  displayWeatherReports();
-}
-
 // add name & coordinates to global objects currentCity & locationList
 function addLocation(location) {
+  // filterLocationInput(location);
   const city = location.results[0].address_components[0].long_name;
   const lat = location.results[0].geometry.location.lat;
   const lon = location.results[0].geometry.location.lng;
@@ -206,6 +181,11 @@ function setCurrentToStorage() {
   } 
 }
 
+// filter out any input not City or Zip Code
+// function filterLocationInput(location) {
+//   if (location.results)
+// }
+
 // add items functions //
 function handleAddLocation() {
   $('.js-location-form').on('submit', function(e) {
@@ -226,47 +206,45 @@ function handleLocationClicked() {
     currentCity = locationsList[itemIndex];
     setCurrentToStorage(currentCity);
     displayWeatherReports();
+    closeSideBar();
   });
 }
 
 function handleLocationDelete() {
-  $('.js-side-nav').on('click', '.delete', function() {
+  $('.js-side-nav').on('click', '.delete', function(e) {
+    e.stopPropagation();
     const itemIndex = $(this).closest('li').attr('id');
     locationsList.splice(itemIndex, 1);
     setListToStorage();
     displayLocationsList();
 
-    if (locationsList.length > 0) {
-      alert('no location');
+    if (locationsList.length === 0) {
       getGeoLocation();
+      closeSideBar();
     } else if (locationsList.indexOf(currentCity) === -1) {
       currentCity = locationsList[0];
       setCurrentToStorage();
-      displayWeatherReports();
+      getCurrentFromStorage();
     } 
-
   });
 }
 
-// // display functions //
-// function displayWelcomeMessage() {
-//   if (currentCity === undefined) {
-//     // remove map
-//     // display message telling user to add location
-//   }
-// }
-
-// function displayCurrentLocationMarker() {
-// }
+function closeSideBar() {
+  $('.main-wrap').toggleClass('slide-right');
+  $('.sidebar').toggleClass('active');
+  $('header').toggleClass('slide-right');
+  $('.js-sidebar-btn').toggleClass('toggle');
+  $('.js-sidebar-btn').toggleClass('mobile');
+}
 
 function displaySidebar() {
   $('.js-sidebar-btn').click(function() {
     $('.sidebar').toggleClass('active');
     $('.js-sidebar-btn').toggleClass('toggle');
-    $('.page-wrap').toggleClass('slide-right');
+    $('.js-sidebar-btn').toggleClass('mobile');
+    $('.main-wrap').toggleClass('slide-right');
     $('header').toggleClass('slide-right');
-    $('.form-container').toggleClass('hidden');
-    $('.js-city-container').toggleClass('slide-left');
+    // $('.form-container').toggleClass('hidden');
   })
 }
 
@@ -286,7 +264,7 @@ function displayWeather(weather) {
   const main = weather.main;
   const windSpeed = getMph(weather.wind.speed);
   const currentWeather = `<div class="current-temp">
-                            <h1>${Math.trunc(main.temp)}&#176F</h1>
+                            <h1>${Math.trunc(main.temp)}&#176</h1>
                             <p>${Math.trunc(main.temp_min)}&#176 | ${Math.trunc(main.temp_max)}&#176</p>
                           </div>                            
                           
@@ -296,6 +274,7 @@ function displayWeather(weather) {
                               <h3>${weather.weather[0].description}</h3>
                             </div>
                             <div class="weather-details">
+                              <h3>Details</h3>
                               <ul>
                                 <li><p>Feels like:</p><span>${getFeelsLike(main.temp, main.humidity, windSpeed)}&#176</span></li>
                                 <li><p>Humidity:</p><span>${main.humidity}%</span></li>
@@ -313,8 +292,9 @@ function displayForecast(dailyForecast) {
   const template = dailyForecast.map(function(day) {
     return  `<ul>
                 <li>${day.day}</li>
-                <li><span data-icon="&#xe001;" class="icon-${day.icon} forecast-icon"></span>${day.temp}&#176</li>
-            </ul>`;
+                <li class="icon"><span data-icon="&#xe001;" class="icon-${day.icon} forecast-icon"></span></li>
+                <li class="forecast-temp">${day.temp}&#176</li>
+              </ul>`;
   });
   $('.js-forecast-results').html(template);
   $('.js-forecast-results').prepend(`<h2>Forecast</h2>`);

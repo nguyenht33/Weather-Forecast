@@ -4,7 +4,7 @@
 	
 	<title>Forecast</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,600" rel="stylesheet">
 	<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	<link rel="stylesheet" type="text/css" href="leaflet/leaflet.css">
@@ -17,30 +17,30 @@
 				<span></span>
 			</button>
 		</div>
-		<div class="js-city-container city-container">
-			
+		<div class="js-city-container city-container">		
 		</div>
 		<div class="form-container">		
 			<form action="#" class="js-location-form">
 			    <label for="location"></label>
-			    <input type="text" class="js-location-input location-input" placeholder="Add location">
+			    <input type="text" class="js-location-input location-input" placeholder="Enter the City or Zip Code">
 			</form>
 	    	<button class="add-btn js-add-btn"><i class='add-shape'></i></button>
 		</div>
-	</header>
+	</header>	
+	<div class ="main-wrap">
+		<nav class="sidebar" role="navigation">
+			<h3>Your Locations</h3>
+			<ul class="js-side-nav side-nav"></ul>
+		</nav>	
 
-	<nav class="sidebar" role="navigation">
-		<h3>Your Locations</h3>
-		<ul class="js-side-nav side-nav"></ul>
-	</nav>	
-
-	<main role="main">
-		<div class="page-wrap">
-			<div class="js-weather-results weather-results"></div>
-		    <div class="js-forecast-results forecast-results"></div>	 
-		    <div id="preMap"><div id="map"></div></div>
-		</div>
-	</main>
+		<main role="main">
+			<div class="page-wrap">
+				<div class="js-weather-results weather-results"></div>
+			    <div class="js-forecast-results forecast-results"></div>	 
+			    <div id="preMap"><div id="map"></div></div>
+			</div>
+		</main>
+	</div>
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="leaflet/leaflet-src.js"></script>

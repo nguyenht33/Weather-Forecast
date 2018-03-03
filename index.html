@@ -29,12 +29,19 @@
 	</header>	
 	<div class ="main-wrap">
 		<nav class="js-sidebar sidebar" role="navigation">
-			<h3>Your Locations</h3>
+			<h3>My Locations</h3>
 			<ul class="js-side-nav side-nav"></ul>
+			<div class="temp-settings">
+				<form>
+					<input type="button" value="F&#176" class="fahrenheit"></button>
+					<input type="button" value="C&#176" class="celcius"></button>
+				<form>
+			</div> 
 		</nav>	
 
 		<main role="main">
 			<div class="page-wrap">
+				<div class="js-city-results city-results"></div>
 				<div class="js-weather-results weather-results"></div>
 			    <div class="js-forecast-results forecast-results"></div>	 
 			    <div id="preMap"><div id="map"></div></div>
@@ -42,6 +49,7 @@
 		</main>
 	</div>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.14/moment-timezone-with-data.min.js"></script>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="leaflet/leaflet-src.js"></script>
 	<script type="text/javascript" src="OWM/leaflet-openweathermap.js"></script>

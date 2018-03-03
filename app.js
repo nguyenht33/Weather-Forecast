@@ -1,12 +1,15 @@
 const geoKey = 'AIzaSyBi4p4_5i-BkoRSKAhOIzUyp9usQTqQitw';
 const geoURL = 'https://maps.googleapis.com/maps/api/geocode/json';
+const timeKey = 'AIzaSyCJVgwxq5ZNiRJeX-iw4c1lE4Rawg3werg';
+const timeURL = 'https://maps.googleapis.com/maps/api/timezone/json';
 const openKey = '335185afd1bee6c30739e6238eec798b';
 const openWeatherURL = 'https://api.openweathermap.org/data/2.5/weather';
 const openForecastURL = 'https://api.openweathermap.org/data/2.5/forecast';
 let currentCity;
+let currentTimeZone;
 let locationsList = [];
-let tempSettingF = true;
-let tempSettingC = false;
+let tempSettingF;
+let tempSettingC;
 
 // ajax functions //
 function getReverseLocation(latlng) {
@@ -41,6 +44,23 @@ function getLocation(address) {
     async: false,
     success: addLocation           
   });
+}
+
+function getTimeZone(latlng, timestamp) {
+  let data = {
+    location: latlng,
+    timestamp: timestamp,
+    key: timeKey
+  };
+
+  $.ajax({
+    type: 'GET',
+    dataType: 'json',
+    url: timeURL,
+    data: data,
+    async: false,
+    success: getCurrentTime
+  })
 }
 
 function getWeather() {
@@ -84,6 +104,7 @@ function getForecast() {
 
 // start app
 function init() {
+  getUnitSettingsFromStorage();
   getListFromLocalStorage();
   getCurrentFromStorage();
   displaySidebar();  
@@ -93,6 +114,29 @@ function init() {
   handleLocationClicked();
   handleLocationDelete();
   handleTempSettingClicked();
+}
+
+
+function getUnitSettingsFromStorage() {
+  let storedSettingF = localStorage.getItem('tempSETTINGF');
+  let storedSettingC = localStorage.getItem('tempSETTINGC');
+  if (storedSettingF !== null && storedSettingC !== null) {
+    let parsedSettingF = JSON.parse(storedSettingF);
+    tempSettingF = parsedSettingF;
+    let parsedSettingC = JSON.parse(storedSettingC);
+    tempSettingC = parsedSettingC;
+  } else {
+    tempSettingF = true;
+    tempSettingC = false;
+  }
+
+  if (tempSettingF === true) {
+    $('.fahrenheit').attr('disabled', true);
+    $('.celcius').attr('disabled', false);
+  } else if (tempSettingC === true) {
+    $('.celcius').attr('disabled', true);
+    $('.fahrenheit').attr('disabled', false);
+  }
 }
 
 // get city list from previous session if it exists
@@ -126,6 +170,11 @@ function setCurrentToStorage() {
   if (currentCity) {
     localStorage.setItem('currentCITY', JSON.stringify(currentCity));
   }; 
+}
+
+function setUnitSettingsToStorage() {
+  localStorage.setItem('tempSETTINGF', JSON.stringify(tempSettingF));
+  localStorage.setItem('tempSETTINGC', JSON.stringify(tempSettingC));
 }
 
 // ask user's permission for their location
@@ -246,7 +295,6 @@ function handleAddLocation() {
   });
 }
 
-// handle click functions //
 function handleLocationClicked() {
   $('.js-side-nav').on('click', 'li', function() {
     const itemIndex = $(this).closest('li').attr('id');
@@ -278,15 +326,20 @@ function handleLocationDelete() {
 }
 
 function handleTempSettingClicked() {
-  $('.js-weather-results').on('click', '.celcius', function(e) {
+  $('.temp-settings').on('click', '.celcius', function(e) {
     handleCelciusConversion();
     tempSettingF = false, tempSettingC = true;
+    setUnitSettingsToStorage();
+
     $(this).attr('disabled', true);
     $('.fahrenheit').attr('disabled', false);
   });
-  $('.js-weather-results').on('click', '.fahrenheit', function(e) {
+
+  $('.temp-settings').on('click', '.fahrenheit', function(e) {
     handleFahrenheitConversion();
     tempSettingF = true, tempSettingC = false;
+    setUnitSettingsToStorage();
+
     $(this).attr('disabled', true);
     $('.celcius').attr('disabled', false); 
   });
@@ -380,15 +433,6 @@ function checkVisibilitySettings(visibility) {
   }
 }
 
-function convertTimeStampToDate(time) {
-
-} 
-
-function convertTimeStampToHour(time) {
-  var day = moment.unix(1318781876);
-  return day;
-}
-
 function closeSidebar() {
   $('.main-wrap').toggleClass('slide-right');
   $('.js-sidebar').toggleClass('active');
@@ -421,6 +465,45 @@ function displaySearchbar() {
   })
 }
 
+function convertTimeStampToHour(time) {
+  let day = moment.unix(time);
+  let hour = day.tz(currentTimeZone).format('h:mm A');
+  return hour;
+}
+
+function getCurrentTime(timeZone) {
+  const day = moment();
+  const zone = timeZone.timeZoneId;
+  currentTimeZone = zone;
+  const date = day.tz(zone).format('ddd MMM Do');
+  const time = day.tz(zone).format('h:mm A');
+  displayCity(date, time, zone);
+}
+
+function updateTime(zone) {
+  const day = moment();  
+  const date = day.tz(zone).format('ddd MMM Do');
+  const time = day.tz(zone).format('h:mm A');
+  $('.date p').first().html(date);
+  $('.date p').last().html(time);
+}
+
+function displayCity(date, time, zone) {
+  const cityAndTime = `<div class="city-name">
+                          <h2>${currentCity.name}<h2>
+                      </div>
+                      <div class="date">
+                        <p>${date}</p>
+                        <p class="hour">${time}</p>
+                      </div>`
+  $('.js-city-results').html(cityAndTime);
+
+  updateTime(zone);
+    setInterval(function(){
+     updateTime(zone);
+    },60000);
+}
+
 function displayLocationsList() {
   const cityItems = locationsList.map((city, index) => {
     return `<li id="${index}" class="sidenav">
@@ -434,35 +517,30 @@ function displayLocationsList() {
 }
 
 function displayWeather(weather) {
-  console.log(weather);
+  const latlng = weather.coord.lat + ',' + weather.coord.lon;
+  const timestamp = weather.dt;
+  getTimeZone(latlng, timestamp);
+
   const main = weather.main;
-  const windSpeed = weather.wind.speed;
   const currentTemp = checkTempSettings(main.temp);
   const currentMaxTemp = checkTempSettings(main.temp_max);
   const currentMinTemp = checkTempSettings(main.temp_min);
+
+  const windSpeed = weather.wind.speed;
   const feelLike = getFeelsLike(main.temp, main.humidity, windSpeed);
-  const feelLikeTemp = checkTempSettings(feelLike);
+  const feelLikeTemp = checkTempSettings(feelLike);  
   const visibility = checkVisibilitySettings(Math.round(weather.visibility));
+
   const sunrise = convertTimeStampToHour(weather.sys.sunrise);
+  const sunset = convertTimeStampToHour(weather.sys.sunset);
 
-  console.log(sunrise);
-
-  const currentWeather = `<div class="city-name">
-                            <h2>${currentCity.name}<h2>
-                          </div>
-                          <div class="current-temp">
+  const currentWeather = `<div class="current-temp">
                             <h1>${Math.round(currentTemp)}&#176</h1>
                             <div>
                               <p>${Math.round(currentMaxTemp)}&#176</p>
                               <p>${Math.round(currentMinTemp)}&#176</p>
                             </div>
-                          </div>                              
-                          <div class="temp-settings">
-                            <form>
-                              <input type="button" value="F&#176" class="fahrenheit" disabled></button>
-                              <input type="button" value="C&#176" class="celcius"></button>
-                            <form>
-                          </div>                                                  
+                          </div>                                                                              
                           <div class="current-weather-container">
                             <div class="current-weather">
                               <span data-icon="&#xe001;" class="icon-${weather.weather[0].icon} current-weather-icon"></span>
@@ -482,11 +560,11 @@ function displayWeather(weather) {
                               <ul>
                                 <li>
                                   <span data-icon="&#xe001;" class="icon-sunrise"></span>
-                                  <p>Sunrise<span></span></p>
+                                  <p>${sunrise}</p>
                                 </li>
                                 <li>
                                   <span data-icon="&#xe001;" class="icon-sunset"></span>
-                                  <p>Sunset<span></span></p>
+                                  <p>${sunset}</p>
                                 </li>
                               </ul>
                             </div>`;

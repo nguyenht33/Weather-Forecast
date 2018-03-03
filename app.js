@@ -5,6 +5,8 @@ const openWeatherURL = 'https://api.openweathermap.org/data/2.5/weather';
 const openForecastURL = 'https://api.openweathermap.org/data/2.5/forecast';
 let currentCity;
 let locationsList = [];
+let tempSettingF = true;
+let tempSettingC = false;
 
 // ajax functions //
 function getReverseLocation(latlng) {
@@ -84,11 +86,13 @@ function getForecast() {
 function init() {
   getListFromLocalStorage();
   getCurrentFromStorage();
-  displaySidebar();
+  displaySidebar();  
+  displayLocationsList(); 
+  displaySearchbar();
   handleAddLocation();
   handleLocationClicked();
   handleLocationDelete();
-  displayLocationsList(); 
+  handleTempSettingClicked();
 }
 
 // get city list from previous session if it exists
@@ -114,11 +118,14 @@ function getCurrentFromStorage() {
   }
 }
 
-// make request calls for weather, forecast & map
-function displayWeatherReports() {
-  getWeather();
-  getForecast();
-  getMap();
+function setListToStorage() {
+  localStorage.setItem('locationsLIST', JSON.stringify(locationsList));
+}
+
+function setCurrentToStorage() {
+  if (currentCity) {
+    localStorage.setItem('currentCITY', JSON.stringify(currentCity));
+  }; 
 }
 
 // ask user's permission for their location
@@ -151,52 +158,93 @@ function getDefaultCity() {
 
 // add name & coordinates to global objects currentCity & locationList
 function addLocation(location) {
-  // filterLocationInput(location);
-  const city = location.results[0].address_components[0].long_name;
+  console.log(location);
   const lat = location.results[0].geometry.location.lat;
   const lon = location.results[0].geometry.location.lng;
- 
-  locationsList.push({name: city, lat: lat, lon: lon});
-  setListToStorage();
+  const cityResult = filterLocationInput(location);
 
-  if (locationsList.length) {
-     currentCity = locationsList[locationsList.length - 1];
+  if (cityResult === "err1" || cityResult === "err2") {
+    displayErrorMessage(cityResult);
+  } else {
+    locationsList.push({name: cityResult, lat: lat, lon: lon});
+    setListToStorage();
 
-     if (currentCity !== undefined) {
-       setCurrentToStorage();
-     }; 
+    if (locationsList.length) {
+       currentCity = locationsList[locationsList.length - 1];
+       if (currentCity !== undefined) {
+         setCurrentToStorage();
+       }; 
+    };
+
+    displayLocationsList();
+    displayWeatherReports(); 
   };
-
-   displayLocationsList();
-   displayWeatherReports(); 
- }
-
-function setListToStorage() {
-  localStorage.setItem('locationsLIST', JSON.stringify(locationsList));
 }
 
-function setCurrentToStorage() {
-  if (currentCity) {
-    localStorage.setItem('currentCITY', JSON.stringify(currentCity));
-  } 
+//filter out input for city name or county name
+function filterLocationInput(location) {
+  const results = location.results;
+  const resultsTypes = results[0].types;
+  const addressComponents = location.results[0].address_components;
+  let addressComponentsList = [], cityName, error;
+
+  for (let i = 0; i < addressComponents.length; i++) {
+    let name = addressComponents[i].long_name;
+    let types = addressComponents[i].types;
+    addressComponentsList.push({ name: name, types: types });
+  };
+  const address = addressComponentsList.find(filterAddress); 
+
+  if (results.length > 1) {
+    return error = "err1";
+  } else if (resultsTypes.indexOf('route') >= 0) {
+    return error = "err2";
+  } else if (address) {
+    return cityName = address.name;  
+  } else {
+    return error = "err2";
+  }
 }
 
-// filter out any input not City or Zip Code
-// function filterLocationInput(location) {
-//   if (location.results)
-// }
+function filterAddress(component) {
+  if (component.types.indexOf('locality') >= 0) {
+    return component.name;
+  } else if (component.types.indexOf('sublocality') >= 0) {
+    return component.name;
+  } else if (component.types.indexOf('administrative_area_level_2') >= 0) {
+    return component.name;
+  }
+};
+
+function displayErrorMessage(error) {
+  if (error === 'err1') {
+    alert('Multiple locations under this name, please specify');
+  } else if (error === 'err2'){
+    alert('Please enter city or zip code for most accurate weather data');
+  };
+}
+
+// make request calls for weather, forecast & map
+function displayWeatherReports() {
+  getWeather();
+  getForecast();
+  getMap();
+}
 
 // add items functions //
 function handleAddLocation() {
   $('.js-location-form').on('submit', function(e) {
     e.preventDefault();
-    const locationTarget = $(event.currentTarget).find('.js-location-input');
-    const address = locationTarget.val();
-    $('.js-location-input').val('');
-    getLocation(address);
+    if ($('.js-location-input').val() === '') {
+      closeSearchbar();
+    } else {
+      const locationTarget = $(event.currentTarget).find('.js-location-input');
+      const address = locationTarget.val();
+      $('.js-location-input').val('');    
+      getLocation(address);
+    }
   });
 }
-
 
 // handle click functions //
 function handleLocationClicked() {
@@ -206,7 +254,7 @@ function handleLocationClicked() {
     currentCity = locationsList[itemIndex];
     setCurrentToStorage(currentCity);
     displayWeatherReports();
-    closeSideBar();
+    closeSidebar();
   });
 }
 
@@ -220,7 +268,7 @@ function handleLocationDelete() {
 
     if (locationsList.length === 0) {
       getGeoLocation();
-      closeSideBar();
+      closeSidebar();
     } else if (locationsList.indexOf(currentCity) === -1) {
       currentCity = locationsList[0];
       setCurrentToStorage();
@@ -229,9 +277,121 @@ function handleLocationDelete() {
   });
 }
 
-function closeSideBar() {
+function handleTempSettingClicked() {
+  $('.js-weather-results').on('click', '.celcius', function(e) {
+    handleCelciusConversion();
+    tempSettingF = false, tempSettingC = true;
+    $(this).attr('disabled', true);
+    $('.fahrenheit').attr('disabled', false);
+  });
+  $('.js-weather-results').on('click', '.fahrenheit', function(e) {
+    handleFahrenheitConversion();
+    tempSettingF = true, tempSettingC = false;
+    $(this).attr('disabled', true);
+    $('.celcius').attr('disabled', false); 
+  });
+}
+
+function handleCelciusConversion() {
+    const currentTemp = $('.current-temp h1').text().slice(0, -1);
+    const convertedCurrentTemp = convertToCelcius(currentTemp);
+    $('.current-temp h1').html(`${convertedCurrentTemp}&#176`);
+
+    const maxTemp = $('.current-temp p').first().text().slice(0, -1);
+    const convertedMaxTemp = convertToCelcius(maxTemp);
+    $('.current-temp p').first().html(`${convertedMaxTemp}&#176`);
+
+    const minTemp = $('.current-temp p').last().text().slice(0, -1);
+    const convertedMinTemp = convertToCelcius(minTemp);
+    $('.current-temp p').last().html(`${convertedMinTemp}&#176`);
+
+    const feelLike = $('.weather-details li span').first().text().slice(0, -1);
+    const convertedFeelLike = convertToCelcius(feelLike);
+    $('.weather-details li span').first().html(`${convertedFeelLike}&#176`);
+
+    const visibility = $('.weather-details li span').last().text().replace(/\D/g,'');
+    const convertedVisibility = getKmh(visibility);
+    $('.weather-details li span').last().html(`${convertedVisibility} km/h`)
+
+    $('.forecast-temp').each(function(index, temp) {
+      const convertedTemp = convertToCelcius($(temp).text().slice(0, -1));
+      $(this).html(`${convertedTemp}&#176`);
+    }); 
+}
+
+function handleFahrenheitConversion() {
+    const currentTemp = $('.current-temp h1').text().slice(0, -1);
+    const convertedCurrentTemp = convertToFahrenheit(currentTemp);
+    $('.current-temp h1').html(`${convertedCurrentTemp}&#176`);
+
+    const maxTemp = $('.current-temp p').first().text().slice(0, -1);
+    const convertedMaxTemp = convertToFahrenheit(maxTemp);
+    $('.current-temp p').first().html(`${convertedMaxTemp}&#176`);
+
+    const minTemp = $('.current-temp p').last().text().slice(0, -1);
+    const convertedMinTemp = convertToFahrenheit(minTemp);
+    $('.current-temp p').last().html(`${convertedMinTemp}&#176`);
+
+    const feelLike = $('.weather-details li span').first().text().slice(0, -1);
+    const convertedFeelLike = convertToFahrenheit(feelLike);
+    $('.weather-details li span').first().html(`${convertedFeelLike}&#176`);
+
+    const visibility = $('.weather-details li span').last().text().replace(/\D/g,'');
+    const convertedVisibility = getMph(visibility);
+    $('.weather-details li span').last().html(`${convertedVisibility} mi`)
+
+    $('.forecast-temp').each(function(index, temp) {
+      const convertedTemp = convertToFahrenheit($(temp).text().slice(0, -1));
+      $(this).html(`${convertedTemp}&#176`);
+    });
+}
+
+function convertToFahrenheit(temp) {
+  const result = (temp * 1.8) + 32;
+  return Math.round(result);
+}
+
+function convertToCelcius(temp) {
+  const result = (temp - 32) / 1.8;
+  return Math.round(result);
+}
+
+function checkTempSettings(temp) {
+  if (tempSettingF) {
+    return temp;
+  } else if (tempSettingC) {
+    return convertToCelcius(temp);
+  }
+}
+
+function checkWindSpeedSettings(wind) {
+  if (tempSettingF) {
+    return `${wind} mph`
+  } else if (tempSettingC) {
+    return `${getKmh(wind)} km/h`
+  }
+}
+
+function checkVisibilitySettings(visibility) {
+  if (tempSettingF) {
+    return `${getMiles(visibility)} mi`
+  } else if (tempSettingC) {
+    return `${Math.round(visibility/1000)} m`
+  }
+}
+
+function convertTimeStampToDate(time) {
+
+} 
+
+function convertTimeStampToHour(time) {
+  var day = moment.unix(1318781876);
+  return day;
+}
+
+function closeSidebar() {
   $('.main-wrap').toggleClass('slide-right');
-  $('.sidebar').toggleClass('active');
+  $('.js-sidebar').toggleClass('active');
   $('header').toggleClass('slide-right');
   $('.js-sidebar-btn').toggleClass('toggle');
   $('.js-sidebar-btn').toggleClass('mobile');
@@ -239,12 +399,25 @@ function closeSideBar() {
 
 function displaySidebar() {
   $('.js-sidebar-btn').click(function() {
-    $('.sidebar').toggleClass('active');
+    $('.js-sidebar').toggleClass('active');
     $('.js-sidebar-btn').toggleClass('toggle');
     $('.js-sidebar-btn').toggleClass('mobile');
     $('.main-wrap').toggleClass('slide-right');
     $('header').toggleClass('slide-right');
-    // $('.form-container').toggleClass('hidden');
+  })
+}
+
+function closeSearchbar() {
+  $('.js-location-input').toggleClass('open');
+  $('.js-add-btn').toggleClass('hidden');
+  $('.js-add-icon').toggleClass('hidden');
+}
+
+function displaySearchbar() {
+  $('.js-add-icon').click(function() {
+    $('.js-location-input').toggleClass('open');
+    $('.js-add-btn').toggleClass('hidden');
+    $('.js-add-icon').toggleClass('hidden');
   })
 }
 
@@ -261,13 +434,35 @@ function displayLocationsList() {
 }
 
 function displayWeather(weather) {
+  console.log(weather);
   const main = weather.main;
-  const windSpeed = getMph(weather.wind.speed);
-  const currentWeather = `<div class="current-temp">
-                            <h1>${Math.trunc(main.temp)}&#176</h1>
-                            <p>${Math.trunc(main.temp_min)}&#176 | ${Math.trunc(main.temp_max)}&#176</p>
-                          </div>                            
-                          
+  const windSpeed = weather.wind.speed;
+  const currentTemp = checkTempSettings(main.temp);
+  const currentMaxTemp = checkTempSettings(main.temp_max);
+  const currentMinTemp = checkTempSettings(main.temp_min);
+  const feelLike = getFeelsLike(main.temp, main.humidity, windSpeed);
+  const feelLikeTemp = checkTempSettings(feelLike);
+  const visibility = checkVisibilitySettings(Math.round(weather.visibility));
+  const sunrise = convertTimeStampToHour(weather.sys.sunrise);
+
+  console.log(sunrise);
+
+  const currentWeather = `<div class="city-name">
+                            <h2>${currentCity.name}<h2>
+                          </div>
+                          <div class="current-temp">
+                            <h1>${Math.round(currentTemp)}&#176</h1>
+                            <div>
+                              <p>${Math.round(currentMaxTemp)}&#176</p>
+                              <p>${Math.round(currentMinTemp)}&#176</p>
+                            </div>
+                          </div>                              
+                          <div class="temp-settings">
+                            <form>
+                              <input type="button" value="F&#176" class="fahrenheit" disabled></button>
+                              <input type="button" value="C&#176" class="celcius"></button>
+                            <form>
+                          </div>                                                  
                           <div class="current-weather-container">
                             <div class="current-weather">
                               <span data-icon="&#xe001;" class="icon-${weather.weather[0].icon} current-weather-icon"></span>
@@ -276,25 +471,37 @@ function displayWeather(weather) {
                             <div class="weather-details">
                               <h3>Details</h3>
                               <ul>
-                                <li><p>Feels like:</p><span>${getFeelsLike(main.temp, main.humidity, windSpeed)}&#176</span></li>
+                                <li><p>Feels like:</p><span>${feelLikeTemp}&#176</span></li>
                                 <li><p>Humidity:</p><span>${main.humidity}%</span></li>
                                 <li><p>Wind:</p><span>${windSpeed} mph</span></li>
-                                <li><p>Visibility:</p><span>${getMiles(weather.visibility)} mi</span></li>
+                                <li><p>Visibility:</p><span>${visibility}</span></li>
                               </ul>
                             </div>
-                          </div>`;
-  const cityName = `<h2>${currentCity.name}<h2>`;
+                          </div>
+                          <div>
+                              <ul>
+                                <li>
+                                  <span data-icon="&#xe001;" class="icon-sunrise"></span>
+                                  <p>Sunrise<span></span></p>
+                                </li>
+                                <li>
+                                  <span data-icon="&#xe001;" class="icon-sunset"></span>
+                                  <p>Sunset<span></span></p>
+                                </li>
+                              </ul>
+                            </div>`;
   $('.js-weather-results').html(currentWeather);
-  $('.js-city-container').html(cityName);
 }
 
 function displayForecast(dailyForecast) {
   const template = dailyForecast.map(function(day) {
+    const temp = checkTempSettings(day.temp);
+    const icon = day.icon.slice(0, -1);
     return  `<ul>
                 <li>${day.day}</li>
-                <li class="icon"><span data-icon="&#xe001;" class="icon-${day.icon} forecast-icon"></span></li>
-                <li class="forecast-temp">${day.temp}&#176</li>
-              </ul>`;
+                <li class="icon"><span data-icon="&#xe001;" class="icon-${icon}d forecast-icon"></span></li>
+                <li class="forecast-temp">${temp}&#176</li>
+             </ul>`;
   });
   $('.js-forecast-results').html(template);
   $('.js-forecast-results').prepend(`<h2>Forecast</h2>`);
@@ -469,9 +676,19 @@ function getMiles(meter) {
   return Math.round(( miles * 10 ) / 10).toFixed(1);
 }
 
-function getMph(meter) {
-  const miles = meter / 0.44704;
-  return Math.round(( miles * 10 ) / 10).toFixed(1);
+// function getMph(meter) {
+//   const miles = meter / 0.44704;
+//   return Math.round(( miles * 10 ) / 10).toFixed(1);
+// }
+
+function getMph(kmh) {
+  const mph = Math.round(kmh) / 1.609344;
+  return Math.round(mph);
+}
+
+function getKmh(mph) {
+  const km = mph * 1.609344 / 10;
+  return Math.round(km);
 }
 
 // map functions //
@@ -509,9 +726,5 @@ function displayMap(lat, lon) {
   };
   let layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 }
-
-
-
-
 
 $(init)

@@ -17,18 +17,18 @@
 				<span></span>
 			</button>
 		</div>
-		<div class="js-city-container city-container">		
-		</div>
-		<div class="form-container">		
-			<form action="#" class="js-location-form">
-			    <label for="location"></label>
-			    <input type="text" class="js-location-input location-input" placeholder="Enter the City or Zip Code">
-			</form>
-	    	<button class="add-btn js-add-btn"><i class='add-shape'></i></button>
-		</div>
+			<div class="form-container">
+				<span class="js-add-icon add-icon"></span>		
+				<form action="#" class="js-location-form">
+				    <label for="location"></label>
+				    <input type="text" class="js-location-input location-input" placeholder="Enter the City or Zip Code">		    	
+				    <button class="js-add-btn add-btn  hidden" type="submit"><i class='icon-plus'></i></button>
+				</form>
+			</div>
+
 	</header>	
 	<div class ="main-wrap">
-		<nav class="sidebar" role="navigation">
+		<nav class="js-sidebar sidebar" role="navigation">
 			<h3>Your Locations</h3>
 			<ul class="js-side-nav side-nav"></ul>
 		</nav>	
@@ -41,7 +41,7 @@
 			</div>
 		</main>
 	</div>
-
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="leaflet/leaflet-src.js"></script>
 	<script type="text/javascript" src="OWM/leaflet-openweathermap.js"></script>

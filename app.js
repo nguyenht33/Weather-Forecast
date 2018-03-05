@@ -116,7 +116,6 @@ function init() {
   handleTempSettingClicked();
 }
 
-
 function getUnitSettingsFromStorage() {
   let storedSettingF = localStorage.getItem('tempSETTINGF');
   let storedSettingC = localStorage.getItem('tempSETTINGC');
@@ -362,9 +361,13 @@ function handleCelciusConversion() {
     const convertedFeelLike = convertToCelcius(feelLike);
     $('.weather-details li span').first().html(`${convertedFeelLike}&#176`);
 
+    const windSpeed = $('.weather-details li:nth-last-child(2) span').text().replace(/\D/g,'');
+    const convertedWindSpeed = getKmh(windSpeed);
+    $('.weather-details li:nth-last-child(2) span').html(`${convertedWindSpeed} km/h`);
+
     const visibility = $('.weather-details li span').last().text().replace(/\D/g,'');
-    const convertedVisibility = getKmh(visibility);
-    $('.weather-details li span').last().html(`${convertedVisibility} km/h`)
+    const convertedVisibility = getKilometersFromMiles(visibility);
+    $('.weather-details li span').last().html(`${convertedVisibility} km`)
 
     $('.forecast-temp').each(function(index, temp) {
       const convertedTemp = convertToCelcius($(temp).text().slice(0, -1));
@@ -389,24 +392,18 @@ function handleFahrenheitConversion() {
     const convertedFeelLike = convertToFahrenheit(feelLike);
     $('.weather-details li span').first().html(`${convertedFeelLike}&#176`);
 
+    const windSpeed = $('.weather-details li:nth-last-child(2) span').text().replace(/\D/g,'');
+    const convertedWindSpeed = getMph(windSpeed);
+    $('.weather-details li:nth-last-child(2) span').html(`${convertedWindSpeed} mph`);
+
     const visibility = $('.weather-details li span').last().text().replace(/\D/g,'');
-    const convertedVisibility = getMph(visibility);
+    const convertedVisibility = getMilesFromKilometers(visibility);
     $('.weather-details li span').last().html(`${convertedVisibility} mi`)
 
     $('.forecast-temp').each(function(index, temp) {
       const convertedTemp = convertToFahrenheit($(temp).text().slice(0, -1));
       $(this).html(`${convertedTemp}&#176`);
     });
-}
-
-function convertToFahrenheit(temp) {
-  const result = (temp * 1.8) + 32;
-  return Math.round(result);
-}
-
-function convertToCelcius(temp) {
-  const result = (temp - 32) / 1.8;
-  return Math.round(result);
 }
 
 function checkTempSettings(temp) {
@@ -419,7 +416,7 @@ function checkTempSettings(temp) {
 
 function checkWindSpeedSettings(wind) {
   if (tempSettingF) {
-    return `${wind} mph`
+    return `${Math.round(wind)} mph`
   } else if (tempSettingC) {
     return `${getKmh(wind)} km/h`
   }
@@ -427,42 +424,10 @@ function checkWindSpeedSettings(wind) {
 
 function checkVisibilitySettings(visibility) {
   if (tempSettingF) {
-    return `${getMiles(visibility)} mi`
+    return `${getMilesFromMeters(visibility)} mi`
   } else if (tempSettingC) {
-    return `${Math.round(visibility/1000)} m`
+    return `${getKilometersFromMeters(visibility)} km`
   }
-}
-
-function closeSidebar() {
-  $('.main-wrap').toggleClass('slide-right');
-  $('.js-sidebar').toggleClass('active');
-  $('header').toggleClass('slide-right');
-  $('.js-sidebar-btn').toggleClass('toggle');
-  $('.js-sidebar-btn').toggleClass('mobile');
-}
-
-function displaySidebar() {
-  $('.js-sidebar-btn').click(function() {
-    $('.js-sidebar').toggleClass('active');
-    $('.js-sidebar-btn').toggleClass('toggle');
-    $('.js-sidebar-btn').toggleClass('mobile');
-    $('.main-wrap').toggleClass('slide-right');
-    $('header').toggleClass('slide-right');
-  })
-}
-
-function closeSearchbar() {
-  $('.js-location-input').toggleClass('open');
-  $('.js-add-btn').toggleClass('hidden');
-  $('.js-add-icon').toggleClass('hidden');
-}
-
-function displaySearchbar() {
-  $('.js-add-icon').click(function() {
-    $('.js-location-input').toggleClass('open');
-    $('.js-add-btn').toggleClass('hidden');
-    $('.js-add-icon').toggleClass('hidden');
-  })
 }
 
 function convertTimeStampToHour(time) {
@@ -475,26 +440,22 @@ function getCurrentTime(timeZone) {
   const day = moment();
   const zone = timeZone.timeZoneId;
   currentTimeZone = zone;
-  const date = day.tz(zone).format('ddd MMM Do');
-  const time = day.tz(zone).format('h:mm A');
-  displayCity(date, time, zone);
+  const date = day.tz(zone).format('dddd h:mm A z');
+  displayCity(date, zone);
 }
 
 function updateTime(zone) {
-  const day = moment();  
-  const date = day.tz(zone).format('ddd MMM Do');
-  const time = day.tz(zone).format('h:mm A');
-  $('.date p').first().html(date);
-  $('.date p').last().html(time);
+  const day = moment();   
+  const date = day.tz(zone).format('dddd h:mm A z');
+  $('.date p').html(date);
 }
 
-function displayCity(date, time, zone) {
+function displayCity(date, zone) {
   const cityAndTime = `<div class="city-name">
                           <h2>${currentCity.name}<h2>
                       </div>
                       <div class="date">
                         <p>${date}</p>
-                        <p class="hour">${time}</p>
                       </div>`
   $('.js-city-results').html(cityAndTime);
 
@@ -526,10 +487,11 @@ function displayWeather(weather) {
   const currentMaxTemp = checkTempSettings(main.temp_max);
   const currentMinTemp = checkTempSettings(main.temp_min);
 
-  const windSpeed = weather.wind.speed;
-  const feelLike = getFeelsLike(main.temp, main.humidity, windSpeed);
+  const wind = weather.wind.speed;
+  const windSpeed = checkWindSpeedSettings(wind);
+  const feelLike = getFeelsLike(main.temp, main.humidity, wind);
   const feelLikeTemp = checkTempSettings(feelLike);  
-  const visibility = checkVisibilitySettings(Math.round(weather.visibility));
+  const visibility = checkVisibilitySettings(weather.visibility);
 
   const sunrise = convertTimeStampToHour(weather.sys.sunrise);
   const sunset = convertTimeStampToHour(weather.sys.sunset);
@@ -540,34 +502,36 @@ function displayWeather(weather) {
                               <p>${Math.round(currentMaxTemp)}&#176</p>
                               <p>${Math.round(currentMinTemp)}&#176</p>
                             </div>
-                          </div>                                                                              
-                          <div class="current-weather-container">
-                            <div class="current-weather">
-                              <span data-icon="&#xe001;" class="icon-${weather.weather[0].icon} current-weather-icon"></span>
-                              <h3>${weather.weather[0].description}</h3>
-                            </div>
+                          </div>                              
+                          <div class="current-weather">
+                            <span data-icon="&#xe001;" class="icon-${weather.weather[0].icon} current-weather-icon"></span>
+                            <h3>${weather.weather[0].description}</h3>
+                          </div>   
+                          <div class="details-container">                                                                         
                             <div class="weather-details">
                               <h3>Details</h3>
                               <ul>
                                 <li><p>Feels like:</p><span>${feelLikeTemp}&#176</span></li>
                                 <li><p>Humidity:</p><span>${main.humidity}%</span></li>
-                                <li><p>Wind:</p><span>${windSpeed} mph</span></li>
+                                <li><p>Wind:</p><span>${windSpeed}</span></li>
                                 <li><p>Visibility:</p><span>${visibility}</span></li>
                               </ul>
                             </div>
-                          </div>
-                          <div>
+                            <div class="sunrise-sunset">
                               <ul>
                                 <li>
-                                  <span data-icon="&#xe001;" class="icon-sunrise"></span>
+                                  <h4>sunrise</h4>
+                                  <span data-icon="&#xe001;" class="icon-sunrise icon-sun"></span>
                                   <p>${sunrise}</p>
                                 </li>
                                 <li>
-                                  <span data-icon="&#xe001;" class="icon-sunset"></span>
+                                  <h4>sunset</h4>
+                                  <span data-icon="&#xe001;" class="icon-sunset icon-sun"></span>
                                   <p>${sunset}</p>
                                 </li>
                               </ul>
-                            </div>`;
+                            </div>
+                          </div>`;
   $('.js-weather-results').html(currentWeather);
 }
 
@@ -582,7 +546,7 @@ function displayForecast(dailyForecast) {
              </ul>`;
   });
   $('.js-forecast-results').html(template);
-  $('.js-forecast-results').prepend(`<h2>Forecast</h2>`);
+  $('.js-forecast-results').prepend(`<h3>Forecast</h3>`);
 }
 
 // calculating 5 days forecast based on OWM's every 3hrs data //
@@ -716,6 +680,16 @@ function mostCommonOccurence(arr = []) {
 }
 
 // math calculations //
+function convertToFahrenheit(temp) {
+  const result = (temp * 1.8) + 32;
+  return Math.round(result);
+}
+
+function convertToCelcius(temp) {
+  const result = (temp - 32) / 1.8;
+  return Math.round(result);
+}
+
 function getFeelsLike(temp, humidity, windSpeed) {
   const heatIndex = getHeatIndex(temp, humidity);
   const windChill = getWindChill(temp, windSpeed);
@@ -749,24 +723,71 @@ function getDay(date) {
   return dayResult;
 }
 
-function getMiles(meter) {
-  const miles = meter*0.000621371192;
-  return Math.round(( miles * 10 ) / 10).toFixed(1);
+function getMilesFromMeters(meter) {
+  const miles = meter * 0.000621371192;
+  return Math.round(miles);
 }
 
-// function getMph(meter) {
-//   const miles = meter / 0.44704;
-//   return Math.round(( miles * 10 ) / 10).toFixed(1);
+function getMilesFromKilometers(kilometers) {
+  const miles = kilometers * 1.60934;
+  return Math.round(miles);
+}
+
+function getKilometersFromMeters(meter) {
+  const km = meter / 1000;
+  return Math.round(km); 
+}
+
+function getKilometersFromMiles(kilometers) {
+  const miles = kilometers / 1.609347;
+  return Math.round(miles);
+}
+
+// function getMeters(miles) {
+//   const result = miles / 0.00062137;
+//   return Math.round(result);
 // }
 
 function getMph(kmh) {
-  const mph = Math.round(kmh) / 1.609344;
+  const mph = kmh / 1.609344;
   return Math.round(mph);
 }
 
 function getKmh(mph) {
-  const km = mph * 1.609344 / 10;
+  const km = mph * 1.609344;
   return Math.round(km);
+}
+
+function closeSidebar() {
+  $('.main-wrap').toggleClass('slide-right');
+  $('.js-sidebar').toggleClass('active');
+  $('header').toggleClass('slide-right');
+  $('.js-sidebar-btn').toggleClass('toggle');
+  $('.js-sidebar-btn').toggleClass('mobile');
+}
+
+function displaySidebar() {
+  $('.js-sidebar-btn').click(function() {
+    $('.js-sidebar').toggleClass('active');
+    $('.js-sidebar-btn').toggleClass('toggle');
+    $('.js-sidebar-btn').toggleClass('mobile');
+    $('.main-wrap').toggleClass('slide-right');
+    $('header').toggleClass('slide-right');
+  })
+}
+
+function closeSearchbar() {
+  $('.js-location-input').toggleClass('open');
+  $('.js-add-btn').toggleClass('hidden');
+  $('.js-add-icon').toggleClass('hidden');
+}
+
+function displaySearchbar() {
+  $('.js-add-icon').click(function() {
+    $('.js-location-input').toggleClass('open');
+    $('.js-add-btn').toggleClass('hidden');
+    $('.js-add-icon').toggleClass('hidden');
+  })
 }
 
 // map functions //
@@ -775,7 +796,9 @@ function getMap() {
     map.remove();
     $('#map').html('');
     $('#preMap').empty();
-    $('<div id="map"></div>').appendTo('#preMap');
+    const mapContainer = `<h3>Map<span data-icon="&#xe001;" class="icon-expand"></span></h3>
+                          <div id="map"></div>`
+    $(mapContainer).appendTo('#preMap');
   } 
   displayMap(currentCity.lat, currentCity.lon);
 }

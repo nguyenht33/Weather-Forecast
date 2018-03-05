@@ -3,21 +3,23 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="1280px" height="800px" viewBox="0 0 1280 800" enable-background="new 0 0 1280 800" xml:space="preserve">
-<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-582.5" y1="1288" x2="-582.5001" y2="391" gradientTransform="matrix(1 0 0 -1 1220 1273)">
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-826.5" y1="-582" x2="-826.5001" y2="315" gradientTransform="matrix(1 0 0 1 1464 567)">
 	<stop  offset="0.0484" style="stop-color:#FFFFFF"/>
 	<stop  offset="0.0914" style="stop-color:#D4FFF6"/>
 	<stop  offset="1" style="stop-color:#FFB354"/>
 </linearGradient>
 <rect x="-18" y="-15" fill="url(#SVGID_1_)" width="1311" height="897"/>
 <g>
-	<circle fill="#F7931E" cx="640.3" cy="147.332" r="47.4"/>
+	<circle fill="#F7931E" cx="640" cy="116.731" r="39.601"/>
 	<g>
-		<circle opacity="0.4" fill="#F7931E" enable-background="new    " cx="640.3" cy="147.332" r="54.7"/>
-		<circle opacity="0.4" fill="#F7931E" enable-background="new    " cx="640.3" cy="147.332" r="51.4"/>
-		<path fill="#FFFFFF" d="M659.8,162.732c0,0,3-2.7,5.5-0.4c1.2,1.2,1.5,3.6,1.5,3.6s1.5-2.3,5-2.7c2.104-0.2,3.8,1.8,3.8,1.8
-			s-3-1.1-6.1,0.4c-2.2,1-3.3,3.3-3.3,3.3s0.2-4-2.604-5.6C661.9,162.532,659.8,162.732,659.8,162.732z"/>
-		<path fill="#FFFFFF" d="M652.4,171.032c0,0,2-1.8,3.695-0.2c0.805,0.8,1,2.4,1,2.4s1-1.6,3.305-1.8c1.396-0.1,2.5,1.2,2.5,1.2
-			s-2-0.7-4.104,0.3c-1.5,0.7-2.2,2.2-2.2,2.2s0.2-2.7-1.695-3.7C653.9,170.832,652.4,171.032,652.4,171.032z"/>
+		<circle opacity="0.4" fill="#F7931E" enable-background="new    " cx="640" cy="116.731" r="45.7"/>
+		<circle opacity="0.4" fill="#F7931E" enable-background="new    " cx="640" cy="116.731" r="42.943"/>
+		<path fill="#FFFFFF" d="M656.292,129.597c0,0,2.506-2.256,4.595-0.334c1.003,1.002,1.253,3.008,1.253,3.008
+			s1.254-1.922,4.178-2.256c1.758-0.167,3.175,1.504,3.175,1.504s-2.507-0.919-5.097,0.334c-1.838,0.835-2.757,2.757-2.757,2.757
+			s0.167-3.342-2.176-4.679C658.047,129.43,656.292,129.597,656.292,129.597z"/>
+		<path fill="#FFFFFF" d="M650.109,136.532c0,0,1.671-1.504,3.087-0.167c0.673,0.668,0.835,2.005,0.835,2.005
+			s0.836-1.337,2.762-1.504c1.166-0.083,2.089,1.002,2.089,1.002s-1.671-0.584-3.429,0.251c-1.253,0.584-1.839,1.837-1.839,1.837
+			s0.168-2.255-1.415-3.091C651.362,136.364,650.109,136.532,650.109,136.532z"/>
 	</g>
 </g>
 </svg>

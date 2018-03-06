@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
 	<title>Forecast</title>
-	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
-	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,600" rel="stylesheet">
-	<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Comfortaa:300,400|Lato" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	<link rel="stylesheet" type="text/css" href="leaflet/leaflet.css">
 	<link rel="stylesheet" type="text/css" href="OWM/leaflet-openweathermap.css"/>
@@ -20,8 +19,7 @@
 			<span class="js-add-icon add-icon"></span>		
 			<form action="#" class="js-location-form">
 			    <label for="location"></label>
-			    <input type="text" class="js-location-input location-input" placeholder="Enter the City or Zip Code">		    	
-			    <button class="js-add-btn add-btn  hidden" type="submit"><i class='icon-plus'></i></button>
+			    <input type="text" class="js-location-input location-input" placeholder="Enter the City or Zip Code">	<button class="js-add-btn add-btn  hidden" type="submit"><i class='icon-plus'></i></button>
 			</form>
 		</div>
 	</header>	
@@ -29,28 +27,25 @@
 		<nav class="js-sidebar sidebar" role="navigation">
 			<h3>My Locations</h3>
 			<ul class="js-side-nav side-nav"></ul>
-			<div class="temp-settings">
-				<form>
-					<input type="button" value="F&#176" class="fahrenheit unit-btn"></button>
-					<input type="button" value="C&#176" class="celcius unit-btn"></button>
-				<form>
-			</div> 
 		</nav>	
 
 		<main role="main">
 			<div class="page-wrap">
+				<div class="js-message message"></div>
 				<div class="js-city-results city-results"></div>
-				<div class="js-weather-results weather-results"></div>
-			    <div class="js-forecast-results forecast-results"></div>	 
-			    <div id="preMap">
-			    	<div id="map"></div>
-			    </div>
+				<div class="weather-content">
+					<div class="js-weather-results weather-results"></div>
+				    <div class="js-forecast-results forecast-results"></div>				    
+				    <div id="preMap">
+				    	<div id="map"></div>
+				    </div>
+			    </div> 
 			</div>
 		</main>
 	</div>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.14/moment-timezone-with-data.min.js"></script>
-	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="jquery-3.3.1.min.js"></script>
 	<script type="text/javascript" src="leaflet/leaflet-src.js"></script>
 	<script type="text/javascript" src="OWM/leaflet-openweathermap.js"></script>
 	<script type="text/javascript" src="app.js"></script>

@@ -25,6 +25,7 @@ function getReverseLocation(latlng) {
     url: geoURL,
     data: data,
     async: false,
+    error: displayErrorMessage,
     success: addLocation       
   });
 }
@@ -42,6 +43,7 @@ function getLocation(address) {
     url: geoURL,
     data: data,
     async: false,
+    error: displayErrorMessage,
     success: addLocation           
   });
 }
@@ -110,6 +112,9 @@ function init() {
   displaySidebar();  
   displayLocationsList(); 
   displaySearchbar();
+  displayUnitSettings();
+  closeMessage();
+  expandMap();
   handleAddLocation();
   handleLocationClicked();
   handleLocationDelete();
@@ -127,14 +132,6 @@ function getUnitSettingsFromStorage() {
   } else {
     tempSettingF = true;
     tempSettingC = false;
-  }
-
-  if (tempSettingF === true) {
-    $('.fahrenheit').attr('disabled', true);
-    $('.celcius').attr('disabled', false);
-  } else if (tempSettingC === true) {
-    $('.celcius').attr('disabled', true);
-    $('.fahrenheit').attr('disabled', false);
   }
 }
 
@@ -206,7 +203,6 @@ function getDefaultCity() {
 
 // add name & coordinates to global objects currentCity & locationList
 function addLocation(location) {
-  console.log(location);
   const lat = location.results[0].geometry.location.lat;
   const lon = location.results[0].geometry.location.lng;
   const cityResult = filterLocationInput(location);
@@ -265,10 +261,25 @@ function filterAddress(component) {
 };
 
 function displayErrorMessage(error) {
+  $('.js-message').toggleClass('show');
   if (error === 'err1') {
-    alert('Multiple locations under this name, please specify');
+    const errorMessage1 = `<div class="message-box">
+                              <p>Multiple locations under this name, please specify.</p>
+                              <span data-icon="&#xe001;" class="icon-close"></span>
+                           </div>`
+    $('.js-message').html(errorMessage1);
   } else if (error === 'err2'){
-    alert('Please enter city or zip code for most accurate weather data');
+    const errorMessage2 = `<div class="message-box">
+                              <p>Please enter city or zip code for most accurate weather data.</p>
+                              <span data-icon="&#xe001;" class="icon-close"></span>
+                           </div>`
+    $('.js-message').html(errorMessage2);
+  } else {
+    const errorMessage3 =  `<div class="message-box">
+                              <p>No locations found under this name, please try again</p>
+                              <span data-icon="&#xe001;" class="icon-close"></span>
+                           </div>`
+    $('.js-message').html(errorMessage3);
   };
 }
 
@@ -288,7 +299,8 @@ function handleAddLocation() {
     } else {
       const locationTarget = $(event.currentTarget).find('.js-location-input');
       const address = locationTarget.val();
-      $('.js-location-input').val('');    
+      $('.js-location-input').val(''); 
+      closeSearchbar();   
       getLocation(address);
     }
   });
@@ -332,6 +344,8 @@ function handleTempSettingClicked() {
 
     $(this).attr('disabled', true);
     $('.fahrenheit').attr('disabled', false);
+    $('.units').toggleClass('show');
+    $('.units').toggleClass('hidden');
   });
 
   $('.temp-settings').on('click', '.fahrenheit', function(e) {
@@ -340,7 +354,9 @@ function handleTempSettingClicked() {
     setUnitSettingsToStorage();
 
     $(this).attr('disabled', true);
-    $('.celcius').attr('disabled', false); 
+    $('.celcius').attr('disabled', false);
+    $('.units').toggleClass('show'); 
+    $('.units').toggleClass('hidden'); 
   });
 }
 
@@ -430,9 +446,22 @@ function checkVisibilitySettings(visibility) {
   }
 }
 
+function checkDayNight(sunrise, sunset) {
+  const day = moment();
+  const time = day.tz(currentTimeZone).format('HH:mm');
+  const sunriseTime = moment(sunrise, ['h:mm A']).format('HH:mm');
+  const sunsetTime = moment(sunset, ['h:mm A']).format('HH:mm');
+
+  if (time > sunriseTime && time < sunsetTime) {
+    $('body').removeClass('night');
+  } else {
+    $('body').addClass('night');
+  }
+}
+
 function convertTimeStampToHour(time) {
-  let day = moment.unix(time);
-  let hour = day.tz(currentTimeZone).format('h:mm A');
+  const day = moment.unix(time);
+  const hour = day.tz(currentTimeZone).format('h:mm A');
   return hour;
 }
 
@@ -440,28 +469,32 @@ function getCurrentTime(timeZone) {
   const day = moment();
   const zone = timeZone.timeZoneId;
   currentTimeZone = zone;
-  const date = day.tz(zone).format('dddd h:mm A z');
-  displayCity(date, zone);
+  const date = day.tz(zone).format('ddd, MMMM d');
+  const hour = day.tz(zone).format('h:mm');
+  displayCity(date, hour);
 }
 
-function updateTime(zone) {
+function updateTime() {
   const day = moment();   
-  const date = day.tz(zone).format('dddd h:mm A z');
-  $('.date p').html(date);
+  const date = day.tz(currentTimeZone).format('ddd, MMMM d');
+  const hour = day.tz(currentTimeZone).format('h:mm');
+  $('.date p').first().html(hour);
+  $('.date p').last().html(date);
 }
 
-function displayCity(date, zone) {
+function displayCity(date, hour) {
   const cityAndTime = `<div class="city-name">
                           <h2>${currentCity.name}<h2>
                       </div>
                       <div class="date">
+                        <p>${hour}</p>
                         <p>${date}</p>
                       </div>`
   $('.js-city-results').html(cityAndTime);
 
-  updateTime(zone);
+  updateTime();
     setInterval(function(){
-     updateTime(zone);
+     updateTime();
     },60000);
 }
 
@@ -469,8 +502,8 @@ function displayLocationsList() {
   const cityItems = locationsList.map((city, index) => {
     return `<li id="${index}" class="sidenav">
               <div class="list-item">
-                <p><i class="fas fa-map-marker"></i>${city.name}</p>
-                <button class="delete">x</button>
+                <p><span data-icon="&#xe001;" class="icon-marker"></span>${city.name}</p>
+                <button class="delete"><span data-icon="&#xe001;" class="icon-close"></span></button>
               </div>
             </li>`
   });
@@ -478,30 +511,52 @@ function displayLocationsList() {
 }
 
 function displayWeather(weather) {
+  // current city & time
   const latlng = weather.coord.lat + ',' + weather.coord.lon;
   const timestamp = weather.dt;
   getTimeZone(latlng, timestamp);
 
+  // current temp
   const main = weather.main;
   const currentTemp = checkTempSettings(main.temp);
   const currentMaxTemp = checkTempSettings(main.temp_max);
   const currentMinTemp = checkTempSettings(main.temp_min);
 
+  // thermometer buttons 
+  let buttonF, buttonC;
+  if (tempSettingF === true) {
+    buttonF = 'disabled';
+    buttonC = 'enabled';
+  } else if (tempSettingC === true) {
+    buttonC = 'disabled';
+    buttonF = 'enabled';
+  }
+
+  // weather details
   const wind = weather.wind.speed;
   const windSpeed = checkWindSpeedSettings(wind);
   const feelLike = getFeelsLike(main.temp, main.humidity, wind);
   const feelLikeTemp = checkTempSettings(feelLike);  
   const visibility = checkVisibilitySettings(weather.visibility);
 
+  // sunrise / sunset
   const sunrise = convertTimeStampToHour(weather.sys.sunrise);
   const sunset = convertTimeStampToHour(weather.sys.sunset);
+  checkDayNight(sunrise, sunset);
 
   const currentWeather = `<div class="current-temp">
-                            <h1>${Math.round(currentTemp)}&#176</h1>
-                            <div>
+                            <div class="temp">
+                              <h1>${Math.round(currentTemp)}&#176</h1>
                               <p>${Math.round(currentMaxTemp)}&#176</p>
                               <p>${Math.round(currentMinTemp)}&#176</p>
                             </div>
+                            <div class="temp-settings">
+                              <div class="units hidden">
+                                <input type="button" value="F&#176" class="fahrenheit unit-btn" ${buttonF}>
+                                <input type="button" value="C&#176" class="celcius unit-btn" ${buttonC}>
+                              </div>                              
+                              <span data-icon="&#xe001;" class="icon-thermometer"></span>
+                            </div> 
                           </div>                              
                           <div class="current-weather">
                             <span data-icon="&#xe001;" class="icon-${weather.weather[0].icon} current-weather-icon"></span>
@@ -743,11 +798,6 @@ function getKilometersFromMiles(kilometers) {
   return Math.round(miles);
 }
 
-// function getMeters(miles) {
-//   const result = miles / 0.00062137;
-//   return Math.round(result);
-// }
-
 function getMph(kmh) {
   const mph = kmh / 1.609344;
   return Math.round(mph);
@@ -763,17 +813,17 @@ function closeSidebar() {
   $('.js-sidebar').toggleClass('active');
   $('header').toggleClass('slide-right');
   $('.js-sidebar-btn').toggleClass('toggle');
-  $('.js-sidebar-btn').toggleClass('mobile');
+  $('.js-sidebar-btn').toggleClass('close');
 }
 
 function displaySidebar() {
   $('.js-sidebar-btn').click(function() {
     $('.js-sidebar').toggleClass('active');
     $('.js-sidebar-btn').toggleClass('toggle');
-    $('.js-sidebar-btn').toggleClass('mobile');
+    $('.js-sidebar-btn').toggleClass('close');
     $('.main-wrap').toggleClass('slide-right');
     $('header').toggleClass('slide-right');
-  })
+  });
 }
 
 function closeSearchbar() {
@@ -782,12 +832,46 @@ function closeSearchbar() {
   $('.js-add-icon').toggleClass('hidden');
 }
 
+function closeMessage() {
+  $('.js-message:not(.message-box)').on('click', function() {
+    $(this).toggleClass('show');
+  });
+  $(document).keyup(function(e) {
+    if (e.keyCode == 27) {
+      $('.js-message').removeClass('show');
+    }
+  });
+}
+
 function displaySearchbar() {
   $('.js-add-icon').click(function() {
     $('.js-location-input').toggleClass('open');
     $('.js-add-btn').toggleClass('hidden');
     $('.js-add-icon').toggleClass('hidden');
-  })
+  });
+}
+
+function displayUnitSettings() {
+  $('.js-weather-results').on('click', '.icon-thermometer', function() {
+    $('.units').toggleClass('show');
+    $('.units').toggleClass('hidden');
+  });
+}
+
+function expandMap() {
+  $('body').on('click', '#preMap span', function() {
+    $('#preMap').toggleClass('expand');
+    $('#map').toggleClass('expand');
+    $('body').toggleClass('expand');
+  });
+
+  $(document).keyup(function(e) {
+    if (e.keyCode == 27) {
+    $('#preMap').removeClass('expand');
+    $('#map').removeClass('expand');
+    $('body').removeClass('expand');
+    }
+  });
 }
 
 // map functions //

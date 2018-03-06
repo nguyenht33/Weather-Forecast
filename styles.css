@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?72aa48');
-  src:  url('fonts/icomoon.eot?72aa48#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?72aa48') format('truetype'),
-    url('fonts/icomoon.woff?72aa48') format('woff'),
-    url('fonts/icomoon.svg?72aa48#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?db6xc3');
+  src:  url('fonts/icomoon.eot?db6xc3#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?db6xc3') format('truetype'),
+    url('fonts/icomoon.woff?db6xc3') format('woff'),
+    url('fonts/icomoon.svg?db6xc3#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,8 +24,17 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-expand:before {
+.icon-marker:before {
+  content: "\e8b5";
+}
+.icon-close:before {
+  content: "\e5cd";
+}
+.icon-thermometer:before {
   content: "\e912";
+}
+.icon-expand:before {
+  content: "\e56b";
 }
 .icon-plus:before {
   content: "\e914";
@@ -91,7 +100,6 @@
   content: "\e911";
 }
 
-
 /*page styles*/
 
 * {
@@ -104,7 +112,7 @@ body {
 	font-family: 'Lato', sans-serif;
 	overflow-x: auto;
 	margin-top: 50px;
-	background-image: url(/images/bg-day.svg);
+	background-image: url(/images/bg-d.svg);
 	background-size: cover; 
     background-repeat: no-repeat;
     background-position: center center; 
@@ -120,7 +128,6 @@ header {
 	background-color: white;
 	z-index: 50;
 }
-
 
 .bar-container {
 	width: 10px;
@@ -149,8 +156,9 @@ header {
 	font-size: 14px;
 	padding: 0 8px;
 	margin-right: 60px;
-	background-color: transparent;
-	border: 1px solid #f7931e;
+	background-color: #DBF1D9;
+	border: none;
+	border-radius: 3px;
 	transform: translateX(200%);
 	transition: transform .3s;
 	z-index: 9;
@@ -251,9 +259,9 @@ ul li {
 
 .list-item button {
 	color: #b577a2;
-	width: 30px;
-	height: 30px;
-	font-size: 28px;
+	width: 20px;
+	height: 20px;
+	font-size: 16px;
 	background: none;
 	border: none;
 	cursor: pointer;
@@ -265,15 +273,11 @@ ul li {
 	cursor: pointer;
 }
 
-.fa-map-marker {
+.icon-marker {
 	color: #b577a2;
-	font-size: 26px;
+	font-size: 20px;
 	padding-right: 10px;
 	text-shadow: 1px 2px 4px #D3D3D3;
-}
-
-.active-marker {
-	color: yellow;
 }
 
 .sidebar-btn {
@@ -336,22 +340,8 @@ ul li {
 	transform: rotate(-45deg);
 }
 
-.sidebar-btn.mobile {
+.sidebar-btn.close {
 	right: 20px;
-	color: white;
-}
-
-.temp-settings {
-	width: 85%;
-	position: fixed;
-	bottom: 0;
-	padding: 20px;
-	background-color: white;
-}
-
-.unit-btn {
-	width: 40px;
-	height: 40px;
 }
 
 .page-wrap {
@@ -370,45 +360,170 @@ ul li {
 	display: none;
 }
 
+.show {
+	display: block;
+}
+
 main {
 	width: 100%;
 	overflow: hidden;
 }
 
 main h3, h4 {
+	font-family: 'Comfortaa', cursive;
 	color: #456166;
+	letter-spacing: 1px;
+}
+
+.message {
+	display: none;
+}
+
+.message.show {
+	display: block;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	z-index: 70;
+	background-color: rgba(153,191,170,0.7);
+}
+
+.message-box {
+	position: absolute;
+	top: 65px;
+	left: 5%;
+	right: 5%;
+	width: 90%;
+	padding: 40px;
+	background-color: #f9fdff;
+	border-radius: 5px;
+	-webkit-box-shadow: 0px 0px 10px 0px rgba(38,123,165,0.41);
+	-moz-box-shadow: 0px 0px 10px 0px rgba(38,123,165,0.41);
+	box-shadow: 0px 0px 10px 0px rgba(38,123,165,0.41);
+}
+
+.message-box p {
+	color: #5c868d;
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.message-box span {
+	position: absolute;
+	top: 10%;
+	right: 3%;
+	color: #267ba5;
+	cursor: pointer;
 }
 
 .city-results {
-	margin-bottom: 110%;
+	font-family: 'Poiret One', cursive;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 
 .city-name {
+	font-family: 'Comfortaa', cursive;
 	color: #267ba5;
-	font-size: 24px;
-	display: flex;
-	justify-content: center;
+	font-size: 16px;
+	letter-spacing: 2px;
+	margin: 0 auto 8px auto;
 }
 
 .date {
+	font-family: 'Comfortaa', cursive;
 	color: #5c868d;
 	font-weight: 600;
-	display: flex;
-	justify-content: center;
+	letter-spacing: 2px;
+	margin: 0 auto;
 }
 
-.date p:after {
-	content: "";
+.date p:first-child {
+	font-size: 80px;
+	line-height: 70px;
+	font-weight: 300;
+}
+
+.date p:nth-child(2) {
+	display: flex;
+	justify-content: center;
+	font-size: 18px;
+}
+
+.weather-content {
+	position: relative;
+	margin-top: 95%;
 }
 
 .current-temp {
-	margin-bottom: 10%;
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 20px;
+}
+
+.temp-settings {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-content: flex-end;
+	align-items: center;
+	margin-top: auto;
+}
+
+.icon-thermometer {
+	color: #d36e93;
+	font-size: 60px;
+	padding: 6px;
+	cursor: pointer;
+}
+
+.icon-thermometer:hover {
+	color: #d36e93;
+}
+
+.units {
+	position: absolute;
+	align-items: center;
+	right: 6px;
+	bottom: 65px;
+}
+
+.unit-btn {
+	display: block;
+	color: #7f2863;
+	font-weight: 600;
+	font-size: 16px;
+	width: 35px;
+	height: 35px;
+	border-radius: 50%;	
+	background-color: #e2b1d3;
+	padding: 1px 0 0 3px;
+	margin-bottom: 5px;
+	border: none;
+	box-shadow: 2px 2px 3px rgba(92,134,141,0.5);
+	cursor: pointer;
+}
+
+.unit-btn:enabled:hover {
+	background-color: #f2fdff;
+}
+
+.unit-btn:disabled {
+	color: #f2fdff;
+	background-color: #ff9d00;
+	cursor: auto;
 }
 
 .current-temp h1 {
 	color: #5c868d;
 	font-size: 100px;
-	letter-spacing: 4px;
+	line-height: 100px;
+	letter-spacing: 2px;
 	text-shadow: 2px 2px 3px rgba(92,134,141,0.5);
 }
 
@@ -418,19 +533,8 @@ main h3, h4 {
 	font-size: 30px;
 }
 
-.current-temp p:nth-of-type(1):after {
+.temp p:nth-of-type(1):after {
 	content: ' | ';
-}
-
-.details-container {
-	color: #091f42;
-	display: flex;
-  	flex-direction: column;
-	width: 100%;
-	padding: 20px;
-	margin: 10px auto;
-	letter-spacing: 1px;
-	background-color: rgba(153,191,170, 0.4);
 }
 
 .current-weather {
@@ -442,6 +546,7 @@ main h3, h4 {
 	padding: 10px 0;
 	color: #5c868d;
 	background-color: rgba(153,191,170, 0.4);
+	border-radius: 5px;
 }
 
 .current-weather-icon {
@@ -452,11 +557,23 @@ main h3, h4 {
 }
 
 .current-weather h3 {
-	font-size: 24px;
+	font-size: 18px;
 	letter-spacing: 2px;
 	text-transform: capitalize;
 	padding: 5px;
 	margin: 10px auto;
+}
+
+.details-container {
+	color: #091f42;
+	display: flex;
+  	flex-direction: column;
+	width: 100%;
+	padding: 20px;
+	margin: 10px auto;
+	letter-spacing: 1px;
+	background-color: rgba(153,191,170, 0.4);
+	border-radius: 5px;
 }
 
 .weather-details ul {
@@ -472,7 +589,7 @@ main h3, h4 {
 }
 
 .weather-details h3 {
-	font-size: 26px;
+	font-size: 20px;
 	padding-bottom: 10px;
 }
 
@@ -494,7 +611,7 @@ main h3, h4 {
 }
 
 .sunrise-sunset h4 {
-	font-size: 20px;
+	font-size: 18px;
 	margin-bottom: 8px;
 }
 
@@ -535,10 +652,11 @@ main h3, h4 {
 	padding: 20px 20px 10px 20px;
 	margin-bottom: 10px;
 	background-color: rgba(153,191,170, 0.5);
+	border-radius: 5px;
 }
 
 .forecast-results h3 {
-	font-size: 26px;
+	font-size: 20px;
 	padding-bottom: 10px;
 }
 
@@ -583,15 +701,37 @@ main h3, h4 {
 #preMap h3 {
 	display: flex;
 	justify-content: space-between;
-	font-size: 26px;
+	font-size: 20px;
 	padding-bottom: 10px;
 	border-bottom: 1px solid #efe9bf;
 	margin-bottom: 15px;
 }
 
-#preMap span {
+.icon-expand {
 	color: #f2fdff;
 	cursor: pointer;
+}
+
+#preMap.expand {
+	position:fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background-color: #C8D0AB;
+	z-index: 60;
+}
+
+#map.expand {
+	width: 100%;
+	height: 90%;
+}
+
+body.expand {
+	margin: 0;
+	height: 100%;
+	overflow: hidden;
 }
 
 #map {
@@ -601,3 +741,291 @@ main h3, h4 {
 	border: 1px solid #efe9bf;
 }
 
+/*Night Mode*/
+
+body.night {
+	background-image: url(/images/bg-n.svg);
+}
+
+body.night header {
+	background-color: #22355e;
+}
+
+body.night .location-input {
+	color: #FFF;
+	background-color: #603962;
+	border: none;
+	border-radius: 3px;
+}
+
+body.night input[type="text"]::placeholder {
+	color: #FFF;
+}
+
+body.night .form-container button {
+	color: #f26636;
+	background-color: #22355e;
+}
+
+body.night .add-icon {
+	color: #8eb1e5;
+	background-color: transparent;
+}
+
+body.night .sidebar {
+	background-color: #22355e; 
+}
+
+body.night .sidebar h3 {
+	border-bottom: 2px solid rgba(108,77,111,.5);
+	color: #8eb1e5;
+}
+
+body.night .list-item {
+	color: #8eb1e5;
+	border-bottom: 1px solid rgba(108,77,111,.5);
+}
+
+body.night .list-item:hover {
+	background-color: rgba(108,77,111,0.8);
+}
+
+body.night .list-item button {
+	color: #ce8ab9;
+}
+
+body.night .icon-marker {
+	color: #ce8ab9;
+	font-size: 20px;
+	padding-right: 10px;
+	text-shadow: 1px 2px 4px #365496;
+}
+
+body.night .sidebar-btn {
+	position: absolute;
+	top: 5px;
+	right: -40px;
+	width: 40px;
+	height: 40px;
+	padding: 0 5px;
+	cursor: pointer;
+	background: none;
+	border: none;
+	outline: none;
+	z-index: 10;
+}
+
+body.night .sidebar-btn span {
+	display: block;
+	width: 35px;
+	height: 3px;
+	background-color: #8eb1e5;
+	position: absolute;
+	top: 15px;
+	transition: .3s;
+}
+
+body.night .sidebar-btn span:before {
+	content: '';
+	position: absolute;
+	top: -10px;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	background-color: #8eb1e5;
+	transition: .3s;
+}
+
+body.night .sidebar-btn span:after {
+	content: '';
+	position: absolute;
+	top: 10px;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	background-color: #8eb1e5;
+	transition: .3s;
+}
+
+body.night .sidebar-btn.toggle span {
+	background: transparent;
+}
+
+body.night .sidebar-btn.toggle span:before {
+	top: 0;
+	transform: rotate(45deg);
+}
+
+body.night .sidebar-btn.toggle span:after {
+	top: 0;
+	transform: rotate(-45deg);
+}
+
+body.night .sidebar-btn.close {
+	right: 20px;
+}
+
+body.night .message.show {
+	background-color: rgba(75,70,106,0.7);
+}
+
+body.night .message-box {
+	background-color: #f9fdff;
+	-webkit-box-shadow: 0px 0px 10px 0px rgba(116,194,247,1);
+	-moz-box-shadow: 0px 0px 10px 0px rgba(116,194,247,1);
+	box-shadow: 0px 0px 10px 0px rgba(116,194,247,1);
+}
+
+body.night .message-box p {
+	color: #267ba5;
+}
+
+body.night .message-box span {
+	color: #267ba5;
+}
+
+body.night main h3 {
+	color: #a2d1f2;
+}
+
+body.night main h4 {
+	color: #a2d1f2;
+}
+
+body.night .city-name {
+	color: #f26636;
+}
+
+body.night .date {
+	color: #edbbcc;
+}
+
+body.night .icon-thermometer {
+	color: #edbbcc;
+}
+
+body.night .icon-thermometer:hover {
+	color: #d36e93;
+}
+
+body.night .unit-btn {
+	color: #7f2863;
+	background-color: #e2b1d3;
+	box-shadow: 2px 2px 3px rgba(92,134,141,0.5);
+}
+
+body.night .unit-btn:enabled:hover {
+	background-color: #f2fdff;
+}
+
+body.night .unit-btn:disabled {
+	color: #f2fdff;
+	background-color: #ff9d00;
+}
+
+body.night .current-temp h1 {
+	color: #74c2f7;
+	text-shadow: 2px 2px 3px rgba(108,77,111,0.5);
+}
+
+body.night .current-temp p {
+	color: #cddef7;
+}
+
+body.night .current-weather {
+	color: #5c868d;
+	background-color: rgba(22,118,163,0.3);
+}
+
+body.night .details-container {
+	color: #091f42;
+	background-color: rgba(22,118,163,0.3);
+}
+
+body.night .current-weather-icon {
+	color: #efdaae;
+	text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+body.night .weather-details ul {
+	border-top: 1px solid #5e99c1;
+}
+
+body.night .weather-details p {
+	color: #ffd6ea;
+}
+
+body.night .weather-details span {
+	color: #efdaae;
+}
+
+body.night .sunrise-sunset {
+	border-top: 1px solid #5e99c1;
+}
+
+body.night .sunrise-sunset p {
+	color: #efdaae;
+}
+
+body.night .icon-sunrise {
+	color: #ffbf59;
+	text-shadow: 1px 1px 3px rgba(69,97,102,0.5);
+}
+
+body.night .icon-sunset {
+	color: #d36e93;
+	text-shadow: 1px 1px 3px rgba(69,97,102,0.5);
+}
+
+body.night .forecast-results {
+	color: #ffd6ea;
+	background-color: rgba(22,118,163,0.3);
+}
+
+body.night .forecast-results ul {
+	border-top: 1px solid #5e99c1;
+}
+
+body.night .forecast-results li:first-child {
+	color: #ffd6ea;
+}
+
+body.night .forecast-icon {
+	color: #efdaae;
+	text-shadow: 1px 1px 3px rgba(69,97,102,0.5);
+}
+
+body.night #preMap {
+	background-color: rgba(22,118,163,0.3);
+}
+
+body.night #preMap h3 {
+	border-bottom: 1px solid #5e99c1;
+}
+
+body.night .icon-expand {
+	color: #efdaae;
+}
+
+body.night #preMap.expand {	
+	position:fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	z-index: 60;
+	background-color: #884F73;
+}
+
+body.night #map {
+	height: 300px;
+	width: 100%;
+	z-index: 1;
+	border: 1px solid #8eb1e5;
+}
+
+body.night #map.expand {
+	width: 100%;
+	height: 90%;
+}

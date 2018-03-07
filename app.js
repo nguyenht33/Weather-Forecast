@@ -203,26 +203,30 @@ function getDefaultCity() {
 
 // add name & coordinates to global objects currentCity & locationList
 function addLocation(location) {
-  const lat = location.results[0].geometry.location.lat;
-  const lon = location.results[0].geometry.location.lng;
-  const cityResult = filterLocationInput(location);
+  if (location.results.length) {
+    const lat = location.results[0].geometry.location.lat;
+    const lon = location.results[0].geometry.location.lng;
+    const cityResult = filterLocationInput(location);
 
-  if (cityResult === "err1" || cityResult === "err2") {
-    displayErrorMessage(cityResult);
-  } else {
-    locationsList.push({name: cityResult, lat: lat, lon: lon});
-    setListToStorage();
+    if (cityResult === "err1" || cityResult === "err2") {
+      displayErrorMessage(cityResult);
+    } else {
+      locationsList.push({name: cityResult, lat: lat, lon: lon});
+      setListToStorage();
 
-    if (locationsList.length) {
-       currentCity = locationsList[locationsList.length - 1];
-       if (currentCity !== undefined) {
-         setCurrentToStorage();
-       }; 
+      if (locationsList.length) {
+         currentCity = locationsList[locationsList.length - 1];
+         if (currentCity !== undefined) {
+           setCurrentToStorage();
+         }; 
+      };
+
+      displayLocationsList();
+      displayWeatherReports(); 
     };
-
-    displayLocationsList();
-    displayWeatherReports(); 
-  };
+  } else {
+    displayErrorMessage();
+  }
 }
 
 //filter out input for city name or county name
@@ -262,6 +266,7 @@ function filterAddress(component) {
 
 function displayErrorMessage(error) {
   $('.js-message').toggleClass('show');
+  $('html, body').animate({scrollTop: 0}, '1000');
   if (error === 'err1') {
     const errorMessage1 = `<div class="message-box">
                               <p>Multiple locations under this name, please specify.</p>
@@ -557,34 +562,36 @@ function displayWeather(weather) {
                               </div>                              
                               <span data-icon="&#xe001;" class="icon-thermometer"></span>
                             </div> 
-                          </div>                              
-                          <div class="current-weather">
-                            <span data-icon="&#xe001;" class="icon-${weather.weather[0].icon} current-weather-icon"></span>
-                            <h3>${weather.weather[0].description}</h3>
-                          </div>   
-                          <div class="details-container">                                                                         
-                            <div class="weather-details">
-                              <h3>Details</h3>
-                              <ul>
-                                <li><p>Feels like:</p><span>${feelLikeTemp}&#176</span></li>
-                                <li><p>Humidity:</p><span>${main.humidity}%</span></li>
-                                <li><p>Wind:</p><span>${windSpeed}</span></li>
-                                <li><p>Visibility:</p><span>${visibility}</span></li>
-                              </ul>
-                            </div>
-                            <div class="sunrise-sunset">
-                              <ul>
-                                <li>
-                                  <h4>sunrise</h4>
-                                  <span data-icon="&#xe001;" class="icon-sunrise icon-sun"></span>
-                                  <p>${sunrise}</p>
-                                </li>
-                                <li>
-                                  <h4>sunset</h4>
-                                  <span data-icon="&#xe001;" class="icon-sunset icon-sun"></span>
-                                  <p>${sunset}</p>
-                                </li>
-                              </ul>
+                          </div>
+                          <div class="current-weather-container">                              
+                            <div class="current-weather">
+                              <span data-icon="&#xe001;" class="icon-${weather.weather[0].icon} current-weather-icon"></span>
+                              <h3>${weather.weather[0].description}</h3>
+                            </div>   
+                            <div class="details-container">                                                              
+                              <div class="weather-details">
+                                <h3>Details</h3>
+                                <ul>
+                                  <li><p>Feels like:</p><span>${feelLikeTemp}&#176</span></li>
+                                  <li><p>Humidity:</p><span>${main.humidity}%</span></li>
+                                  <li><p>Wind:</p><span>${windSpeed}</span></li>
+                                  <li><p>Visibility:</p><span>${visibility}</span></li>
+                                </ul>
+                              </div>
+                              <div class="sunrise-sunset">
+                                <ul>
+                                  <li>
+                                    <h4>sunrise</h4>
+                                    <span data-icon="&#xe001;" class="icon-sunrise icon-sun"></span>
+                                    <p>${sunrise}</p>
+                                  </li>
+                                  <li>
+                                    <h4>sunset</h4>
+                                    <span data-icon="&#xe001;" class="icon-sunset icon-sun"></span>
+                                    <p>${sunset}</p>
+                                  </li>
+                                </ul>
+                              </div>
                             </div>
                           </div>`;
   $('.js-weather-results').html(currentWeather);

@@ -25,7 +25,6 @@ function getReverseLocation(latlng) {
     url: geoURL,
     data: data,
     async: false,
-    error: displayErrorMessage,
     success: addLocation       
   });
 }
@@ -43,7 +42,6 @@ function getLocation(address) {
     url: geoURL,
     data: data,
     async: false,
-    error: displayErrorMessage,
     success: addLocation           
   });
 }
@@ -342,7 +340,7 @@ function handleLocationDelete() {
 }
 
 function handleTempSettingClicked() {
-  $('.temp-settings').on('click', '.celcius', function(e) {
+  $('.js-temp-results').on('click', '.celcius', function(e) {
     handleCelciusConversion();
     tempSettingF = false, tempSettingC = true;
     setUnitSettingsToStorage();
@@ -353,7 +351,7 @@ function handleTempSettingClicked() {
     $('.units').toggleClass('hidden');
   });
 
-  $('.temp-settings').on('click', '.fahrenheit', function(e) {
+  $('.js-temp-results').on('click', '.fahrenheit', function(e) {
     handleFahrenheitConversion();
     tempSettingF = true, tempSettingC = false;
     setUnitSettingsToStorage();
@@ -448,10 +446,10 @@ function checkVisibilitySettings(visibility) {
     return `${getMilesFromMeters(visibility)} mi`
   } else if (tempSettingC) {
     return `${getKilometersFromMeters(visibility)} km`
-  }
+  };
 }
 
-function checkDayNight(sunrise, sunset) {
+function checkDayNight(sunrise, sunset, icon) {
   const day = moment();
   const time = day.tz(currentTimeZone).format('HH:mm');
   const sunriseTime = moment(sunrise, ['h:mm A']).format('HH:mm');
@@ -459,9 +457,19 @@ function checkDayNight(sunrise, sunset) {
 
   if (time > sunriseTime && time < sunsetTime) {
     $('body').removeClass('night');
+    if (icon !== '01d') {
+      $('.js-weather-image').html('<img src="images/sun-cloud.svg" alt="cloudy-day" class="weather-img">');
+    } else {
+      $('.js-weather-image').html('<img src="images/sun.svg" alt="clear-day" class="weather-img">');
+    };
   } else {
     $('body').addClass('night');
-  }
+    if (icon !== '01n') {
+      $('.js-weather-image').html('<img src="images/moon-cloud.svg" alt="cloudy-night" class="weather-img">');
+    } else {    
+      $('.js-weather-image').html('<img src="images/moon.svg" alt="moon" class="weather-img">')
+    };
+  };
 }
 
 function convertTimeStampToHour(time) {
@@ -526,16 +534,7 @@ function displayWeather(weather) {
   const currentTemp = checkTempSettings(main.temp);
   const currentMaxTemp = checkTempSettings(main.temp_max);
   const currentMinTemp = checkTempSettings(main.temp_min);
-
-  // thermometer buttons 
-  let buttonF, buttonC;
-  if (tempSettingF === true) {
-    buttonF = 'disabled';
-    buttonC = 'enabled';
-  } else if (tempSettingC === true) {
-    buttonC = 'disabled';
-    buttonF = 'enabled';
-  }
+  displayTemperature(currentTemp, currentMaxTemp, currentMinTemp);
 
   // weather details
   const wind = weather.wind.speed;
@@ -547,55 +546,71 @@ function displayWeather(weather) {
   // sunrise / sunset
   const sunrise = convertTimeStampToHour(weather.sys.sunrise);
   const sunset = convertTimeStampToHour(weather.sys.sunset);
-  checkDayNight(sunrise, sunset);
+  const icon = weather.weather[0].icon;
+  checkDayNight(sunrise, sunset, icon);
 
-  const currentWeather = `<div class="current-temp">
-                            <div class="temp">
-                              <h1>${Math.round(currentTemp)}&#176</h1>
-                              <p>${Math.round(currentMaxTemp)}&#176</p>
-                              <p>${Math.round(currentMinTemp)}&#176</p>
+  const weatherCondition = `<h3>Condition</h3>
+                            <div class="current-condition">
+                              <span data-icon="&#xe001;" class="icon-${icon} weather-condition-icon"></span>
+                              <h2>${weather.weather[0].description}</h2>
+                            </div>`
+
+  const weatherDetails = `<div class="details-container">                              
+                            <div class="weather-details">
+                              <h3>Details</h3>
+                              <ul>
+                                <li><p>Feels like:</p><span>${feelLikeTemp}&#176</span></li>
+                                <li><p>Humidity:</p><span>${main.humidity}%</span></li>
+                                <li><p>Wind:</p><span>${windSpeed}</span></li>
+                                <li><p>Visibility:</p><span>${visibility}</span></li>
+                              </ul>
                             </div>
-                            <div class="temp-settings">
-                              <div class="units hidden">
-                                <input type="button" value="F&#176" class="fahrenheit unit-btn" ${buttonF}>
-                                <input type="button" value="C&#176" class="celcius unit-btn" ${buttonC}>
-                              </div>                              
-                              <span data-icon="&#xe001;" class="icon-thermometer"></span>
-                            </div> 
-                          </div>
-                          <div class="current-weather-container">                              
-                            <div class="current-weather">
-                              <span data-icon="&#xe001;" class="icon-${weather.weather[0].icon} current-weather-icon"></span>
-                              <h3>${weather.weather[0].description}</h3>
-                            </div>   
-                            <div class="details-container">                                                              
-                              <div class="weather-details">
-                                <h3>Details</h3>
-                                <ul>
-                                  <li><p>Feels like:</p><span>${feelLikeTemp}&#176</span></li>
-                                  <li><p>Humidity:</p><span>${main.humidity}%</span></li>
-                                  <li><p>Wind:</p><span>${windSpeed}</span></li>
-                                  <li><p>Visibility:</p><span>${visibility}</span></li>
-                                </ul>
-                              </div>
-                              <div class="sunrise-sunset">
-                                <ul>
-                                  <li>
-                                    <h4>sunrise</h4>
-                                    <span data-icon="&#xe001;" class="icon-sunrise icon-sun"></span>
-                                    <p>${sunrise}</p>
-                                  </li>
-                                  <li>
-                                    <h4>sunset</h4>
-                                    <span data-icon="&#xe001;" class="icon-sunset icon-sun"></span>
-                                    <p>${sunset}</p>
-                                  </li>
-                                </ul>
-                              </div>
+                            <div class="sunrise-sunset">
+                              <ul>
+                                <li>
+                                  <h4>sunrise</h4>
+                                  <span data-icon="&#xe001;" class="icon-sunrise icon-sun"></span>
+                                  <p>${sunrise}</p>
+                                </li>
+                                <li>
+                                  <h4>sunset</h4>
+                                  <span data-icon="&#xe001;" class="icon-sunset icon-sun"></span>
+                                  <p>${sunset}</p>
+                                </li>
+                              </ul>
                             </div>
                           </div>`;
-  $('.js-weather-results').html(currentWeather);
+  $('.js-weather-condition').html(weatherCondition);
+  $('.js-weather-results').html(weatherDetails);
 }
+
+function displayTemperature(currentTemp, currentMaxTemp, currentMinTemp) {
+  let buttonF, buttonC;
+  if (tempSettingF === true) {
+    buttonF = 'disabled';
+    buttonC = 'enabled';
+  } else if (tempSettingC === true) {
+    buttonC = 'disabled';
+    buttonF = 'enabled';
+  }
+  const currentTemperature = `<div class="current-temp">
+                                <div class="temp">
+                                  <h1>${Math.round(currentTemp)}&#176</h1>
+                                  <p>${Math.round(currentMaxTemp)}&#176</p>
+                                  <p>${Math.round(currentMinTemp)}&#176</p>
+                                </div>
+                                <div class="temp-settings">
+                                  <div class="units hidden">
+                                    <input type="button" value="F&#176" class="fahrenheit unit-btn" ${buttonF}>
+                                    <input type="button" value="C&#176" class="celcius unit-btn" ${buttonC}>
+                                  </div>                              
+                                  <span data-icon="&#xe001;" class="icon-thermometer"></span>
+                                </div> 
+                              </div>`;
+  $('.js-temp-results').html(currentTemperature);
+}
+
+
 
 function displayForecast(dailyForecast) {
   const template = dailyForecast.map(function(day) {
@@ -815,21 +830,45 @@ function getKmh(mph) {
   return Math.round(km);
 }
 
+function handleSideBarCloseBtn() {
+
+}
+
 function closeSidebar() {
   $('.main-wrap').toggleClass('slide-right');
   $('.js-sidebar').toggleClass('active');
   $('header').toggleClass('slide-right');
   $('.js-sidebar-btn').toggleClass('toggle');
   $('.js-sidebar-btn').toggleClass('close');
+  $('.bar-container').toggleClass('close');
+  removeResize();
+}
+
+function toggleResize() {
+  $('.main-wrap').toggleClass('resize');
+  $('.col-2').toggleClass('resize');
+  $('.details-container').toggleClass('resize');
+  $('.page-wrap').toggleClass('resize');
+  $('.current-condition h2').toggleClass('resize');
+}
+
+function removeResize() {
+  $('.main-wrap').removeClass('resize');
+  $('.col-2').removeClass('resize');
+  $('.details-container').removeClass('resize');
+  $('.page-wrap').removeClass('resize');
+  $('.current-condition h2').removeClass('resize');
 }
 
 function displaySidebar() {
   $('.js-sidebar-btn').click(function() {
+    toggleResize();
     $('.js-sidebar').toggleClass('active');
+    $('.bar-container').toggleClass('close');
     $('.js-sidebar-btn').toggleClass('toggle');
     $('.js-sidebar-btn').toggleClass('close');
     $('.main-wrap').toggleClass('slide-right');
-    $('header').toggleClass('slide-right');
+    $('header').toggleClass('slide-right');  
   });
 }
 
@@ -859,7 +898,7 @@ function displaySearchbar() {
 }
 
 function displayUnitSettings() {
-  $('.js-weather-results').on('click', '.icon-thermometer', function() {
+  $('.js-temp-results').on('click', '.icon-thermometer', function() {
     $('.units').toggleClass('show');
     $('.units').toggleClass('hidden');
   });

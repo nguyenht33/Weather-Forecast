@@ -119,6 +119,7 @@ function init() {
   handleTempSettingClicked();
 }
 
+// get unit settings from previous session 
 function getUnitSettingsFromStorage() {
   let storedSettingF = localStorage.getItem('tempSETTINGF');
   let storedSettingC = localStorage.getItem('tempSETTINGC');
@@ -156,6 +157,11 @@ function getCurrentFromStorage() {
   }
 }
 
+function setUnitSettingsToStorage() {
+  localStorage.setItem('tempSETTINGF', JSON.stringify(tempSettingF));
+  localStorage.setItem('tempSETTINGC', JSON.stringify(tempSettingC));
+}
+
 function setListToStorage() {
   localStorage.setItem('locationsLIST', JSON.stringify(locationsList));
 }
@@ -164,11 +170,6 @@ function setCurrentToStorage() {
   if (currentCity) {
     localStorage.setItem('currentCITY', JSON.stringify(currentCity));
   }; 
-}
-
-function setUnitSettingsToStorage() {
-  localStorage.setItem('tempSETTINGF', JSON.stringify(tempSettingF));
-  localStorage.setItem('tempSETTINGC', JSON.stringify(tempSettingC));
 }
 
 // ask user's permission for their location
@@ -199,13 +200,31 @@ function getDefaultCity() {
   getReverseLocation(latlng);
 }
 
+// get user location input
+function handleAddLocation() {
+  $('.js-location-form').on('submit', function(e) {
+    e.preventDefault();
+    if ($('.js-location-input').val() === '') {
+      closeSearchbar();
+    } else {
+      const locationTarget = $(event.currentTarget).find('.js-location-input');
+      const address = locationTarget.val();
+      $('.js-location-input').val(''); 
+      closeSearchbar();   
+      getLocation(address);
+    }
+  });
+}
+
 // add name & coordinates to global objects currentCity & locationList
 function addLocation(location) {
   if (location.results.length) {
     const lat = location.results[0].geometry.location.lat;
     const lon = location.results[0].geometry.location.lng;
+    // filter location input
     const cityResult = filterLocationInput(location);
 
+    // display error message if doesn't meet conditions
     if (cityResult === "err1" || cityResult === "err2") {
       displayErrorMessage(cityResult);
     } else {
@@ -218,7 +237,6 @@ function addLocation(location) {
            setCurrentToStorage();
          }; 
       };
-
       displayLocationsList();
       displayWeatherReports(); 
     };
@@ -227,7 +245,7 @@ function addLocation(location) {
   }
 }
 
-//filter out input for city name or county name
+// filter out input for locality, sublocatity, and admin area lv.2
 function filterLocationInput(location) {
   const results = location.results;
   const resultsTypes = results[0].types;
@@ -293,22 +311,6 @@ function displayWeatherReports() {
   getMap();
 }
 
-// add items functions //
-function handleAddLocation() {
-  $('.js-location-form').on('submit', function(e) {
-    e.preventDefault();
-    if ($('.js-location-input').val() === '') {
-      closeSearchbar();
-    } else {
-      const locationTarget = $(event.currentTarget).find('.js-location-input');
-      const address = locationTarget.val();
-      $('.js-location-input').val(''); 
-      closeSearchbar();   
-      getLocation(address);
-    }
-  });
-}
-
 function handleLocationClicked() {
   $('.js-side-nav').on('click', 'li', function() {
     const itemIndex = $(this).closest('li').attr('id');  
@@ -343,6 +345,7 @@ function handleLocationDelete() {
   });
 }
 
+// handle metric / imperial conversions
 function handleTempSettingClicked() {
   $('.js-temp-results').on('click', '.celcius', function(e) {
     handleCelciusConversion();
@@ -429,6 +432,7 @@ function handleFahrenheitConversion() {
     });
 }
 
+// check units settings before displaying weather data
 function checkTempSettings(temp) {
   if (tempSettingF) {
     return temp;
@@ -453,6 +457,7 @@ function checkVisibilitySettings(visibility) {
   };
 }
 
+// check time setting to display night or day theme
 function checkDayNight(sunrise, sunset, icon) {
   const day = moment();
   const time = day.tz(currentTimeZone).format('HH:mm');
@@ -464,7 +469,7 @@ function checkDayNight(sunrise, sunset, icon) {
     if (icon !== '01d') {
       $('.js-weather-image').html('<img src="./images/sun-cloud.svg" alt="cloudy-day" class="weather-img">');
     } else {
-      $('.js-weather-image').html('<img src="images/sun.svg" alt="clear-day" class="weather-img">');
+      $('.js-weather-image').html('<img src="./images/sun.svg" alt="clear-day" class="weather-img">');
     };
   } else {
     $('body').addClass('night');
@@ -499,6 +504,7 @@ function updateTime() {
   $('.date p').last().html(date);
 }
 
+// display city, date & time
 function displayCity(date, hour) {
   const cityAndTime = `<div class="city-name">
                           <h2>${currentCity.name}<h2>
@@ -515,6 +521,7 @@ function displayCity(date, hour) {
     },60000);
 }
 
+// display cities list
 function displayLocationsList() {
   const cityItems = locationsList.map((city, index) => {
     return `<li id="${index}" class="sidenav">
@@ -535,6 +542,7 @@ function displayCurrentCityMarker() {
   $(".list-item p:contains('" + currentCity.name + "') span").addClass('active-marker');
 }
 
+// displaying main content of app
 function displayWeather(weather) {
   // current city & time
   const latlng = weather.coord.lat + ',' + weather.coord.lon;
@@ -621,8 +629,6 @@ function displayTemperature(currentTemp, currentMaxTemp, currentMinTemp) {
                               </div>`;
   $('.js-temp-results').html(currentTemperature);
 }
-
-
 
 function displayForecast(dailyForecast) {
   const template = dailyForecast.map(function(day) {
@@ -842,6 +848,44 @@ function getKmh(mph) {
   return Math.round(km);
 }
 
+// UI tasks
+function displaySearchbar() {
+  $('.js-add-icon').click(function() {
+    $('.js-location-input').toggleClass('open');
+    $('.js-add-btn').toggleClass('hidden');
+    $('.js-add-icon').toggleClass('hidden');
+  });
+}
+
+function closeSearchbar() {
+  $('.js-location-input').toggleClass('open');
+  $('.js-add-btn').toggleClass('hidden');
+  $('.js-add-icon').toggleClass('hidden');
+}
+
+function closeMessage() {
+  $('.js-message:not(.message-box)').on('click', function() {
+    $(this).toggleClass('show');
+  });
+  $(document).keyup(function(e) {
+    if (e.keyCode == 27) {
+      $('.js-message').removeClass('show');
+    }
+  });
+}
+
+function displaySidebar() {
+  $('.js-sidebar-btn').click(function() {
+    toggleResize();
+    $('.js-sidebar').toggleClass('active');
+    $('.bar-container').toggleClass('close');
+    $('.js-sidebar-btn').toggleClass('toggle');
+    $('.js-sidebar-btn').toggleClass('close');
+    $('.main-wrap').toggleClass('slide-right');
+    $('header').toggleClass('slide-right');  
+  });
+}
+
 function closeSidebar() {
   $('.main-wrap').toggleClass('slide-right');
   $('.js-sidebar').toggleClass('active');
@@ -866,43 +910,6 @@ function removeResize() {
   $('.details-container').removeClass('resize');
   $('.page-wrap').removeClass('resize');
   $('.current-condition h2').removeClass('resize');
-}
-
-function displaySidebar() {
-  $('.js-sidebar-btn').click(function() {
-    toggleResize();
-    $('.js-sidebar').toggleClass('active');
-    $('.bar-container').toggleClass('close');
-    $('.js-sidebar-btn').toggleClass('toggle');
-    $('.js-sidebar-btn').toggleClass('close');
-    $('.main-wrap').toggleClass('slide-right');
-    $('header').toggleClass('slide-right');  
-  });
-}
-
-function closeSearchbar() {
-  $('.js-location-input').toggleClass('open');
-  $('.js-add-btn').toggleClass('hidden');
-  $('.js-add-icon').toggleClass('hidden');
-}
-
-function closeMessage() {
-  $('.js-message:not(.message-box)').on('click', function() {
-    $(this).toggleClass('show');
-  });
-  $(document).keyup(function(e) {
-    if (e.keyCode == 27) {
-      $('.js-message').removeClass('show');
-    }
-  });
-}
-
-function displaySearchbar() {
-  $('.js-add-icon').click(function() {
-    $('.js-location-input').toggleClass('open');
-    $('.js-add-btn').toggleClass('hidden');
-    $('.js-add-icon').toggleClass('hidden');
-  });
 }
 
 function displayUnitSettings() {

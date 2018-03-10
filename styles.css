@@ -544,8 +544,8 @@ main h3 {
 }
 
 .unit-btn:disabled {
-	color: #E3FFF9;
 	background-color: #dbc0d3;
+	opacity: .5;
 	cursor: auto;
 }
 
@@ -925,10 +925,6 @@ body.night .unit-btn {
 }
 body.night .unit-btn:enabled:hover {
 	background-color: #F36635;
-}
-body.night .unit-btn:disabled {
-	color: #4D4B6D;
-	background-color: #e2b1d3;
 }
 body.night .current-temp h1 {
 	color: #74c2f7;

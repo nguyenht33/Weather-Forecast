@@ -116,9 +116,6 @@ body {
 	background-size: cover; 
     background-repeat: no-repeat;
     background-position: center center; 
-	  transition: opacity .25s ease-in-out;
-	-moz-transition: opacity .25s ease-in-out;
-	-webkit-transition: opacity .25s ease-in-out;
 }
 
 header {	
@@ -283,6 +280,10 @@ ul li {
 	text-shadow: 1px 2px 4px #D3D3D3;
 }
 
+.active-marker {
+	color: #F8931E;
+}
+
 .sidebar-btn {
 	position: absolute;
 	top: 5px;
@@ -336,13 +337,11 @@ ul li {
 .sidebar-btn.toggle span:before {
 	top: 0;
 	transform: rotate(45deg);
-		background-color: #FF0000;
 }
 
 .sidebar-btn.toggle span:after {
 	top: 0;
 	transform: rotate(-45deg);
-		background-color: #FF0000;
 }
 
 .sidebar-btn.close {
@@ -822,6 +821,9 @@ body.night .icon-marker {
 	padding-right: 10px;
 	text-shadow: 1px 2px 4px #365496;
 }
+body.night .active-marker {
+	color: #F36635;
+}
 body.night .sidebar-btn {
 	position: absolute;
 	top: 5px;
@@ -916,7 +918,7 @@ body.night .icon-thermometer:hover {
 }
 body.night .unit-btn {
 	color: #7f2863;
-	background-color: #d36e93;
+	background-color: #e2b1d3;
 	box-shadow: 2px 2px 3px rgba(42,94,128,0.5);
 }
 body.night .unit-btn:enabled:hover {
@@ -924,7 +926,7 @@ body.night .unit-btn:enabled:hover {
 }
 body.night .unit-btn:disabled {
 	color: #4D4B6D;
-	background-color: #DBC0D3;
+	background-color: #e2b1d3;
 }
 body.night .current-temp h1 {
 	color: #74c2f7;
@@ -1187,4 +1189,3 @@ body.night #map.expand {
 		padding: 20px 30% 20px 30%;
 	}
 }
-

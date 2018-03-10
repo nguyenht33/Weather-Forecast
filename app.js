@@ -311,9 +311,10 @@ function handleAddLocation() {
 
 function handleLocationClicked() {
   $('.js-side-nav').on('click', 'li', function() {
-    const itemIndex = $(this).closest('li').attr('id');
-   
+    const itemIndex = $(this).closest('li').attr('id');  
     currentCity = locationsList[itemIndex];
+
+    displayCurrentCityMarker();
     setCurrentToStorage(currentCity);
     displayWeatherReports();
     closeSidebar();
@@ -327,14 +328,17 @@ function handleLocationDelete() {
     locationsList.splice(itemIndex, 1);
     setListToStorage();
     displayLocationsList();
+    displayCurrentCityMarker();
 
     if (locationsList.length === 0) {
       getGeoLocation();
+      displayCurrentCityMarker();
       closeSidebar();
     } else if (locationsList.indexOf(currentCity) === -1) {
       currentCity = locationsList[0];
       setCurrentToStorage();
       getCurrentFromStorage();
+      displayCurrentCityMarker();
     } 
   });
 }
@@ -521,6 +525,12 @@ function displayLocationsList() {
             </li>`
   });
   $('.js-side-nav').html(cityItems);
+  displayCurrentCityMarker();
+}
+
+function displayCurrentCityMarker() {
+  $('.list-item p span').removeClass('active-marker');
+  $(".list-item p:contains('" + currentCity.name + "') span").addClass('active-marker');
 }
 
 function displayWeather(weather) {
@@ -828,10 +838,6 @@ function getMph(kmh) {
 function getKmh(mph) {
   const km = mph * 1.609344;
   return Math.round(km);
-}
-
-function handleSideBarCloseBtn() {
-
 }
 
 function closeSidebar() {

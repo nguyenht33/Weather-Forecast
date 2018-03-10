@@ -1,61 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<title>Forecast</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="https://fonts.googleapis.com/css?family=Comfortaa:300,400|Lato" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="styles.css">
-	<link rel="stylesheet" type="text/css" href="leaflet/leaflet.css">
-	<link rel="stylesheet" type="text/css" href="OWM/leaflet-openweathermap.css"/>
-</head>
-<body>	
-	<header>
-		<div class="bar-container">
-			<button class="js-sidebar-btn sidebar-btn">
-				<span></span>
-			</button>
-		</div>
-		<div class="form-container">
-			<span class="js-add-icon add-icon"></span>		
-			<form action="#" class="js-location-form">
-			    <label for="location"></label>
-			    <input type="text" class="js-location-input location-input" placeholder="Enter the City or Zip Code">	<button class="js-add-btn add-btn  hidden" type="submit"><i class='icon-plus'></i></button>
-			</form>
-		</div>
-	</header>	
-	<div class ="main-wrap">
-		<nav class="js-sidebar sidebar" role="navigation">
-			<h3>My Locations</h3>
-			<ul class="js-side-nav side-nav"></ul>
-		</nav>	
-		<main role="main">
-			<div class="page-wrap">
-				<div class="wrap-one">
-					<div class="js-message message"></div>			
-					<div class="js-city-results city-results"></div>
-					<div class="js-weather-image weather-image"></div>	
-					<div class="js-temp-results temp-results"></div>
-				</div>
-				<div class="wrap-two">
-					<div class="col-1">	
-						<div class="js-weather-condition weather-condition"></div>
-					</div>
-					<div class="col-2">						
-						<div class="js-weather-results weather-results"></div>
-				    	<div class="js-forecast-results forecast-results"></div>
-				    </div>		
-				    <div id="preMap">
-				    	<div id="map"></div>
-				    </div>
-			    </div> 
+	<head>
+		<title>The Weather Report</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="https://fonts.googleapis.com/css?family=Comfortaa:300,400|Lato" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="styles.css">
+		<link rel="stylesheet" type="text/css" href="leaflet/leaflet.css">
+		<link rel="stylesheet" type="text/css" href="OWM/leaflet-openweathermap.css"/>
+	</head>
+	<body>	
+		<header role="header">
+			<div class="bar-container">
+				<button class="js-sidebar-btn sidebar-btn">
+					<span></span>
+				</button>
 			</div>
-		</main>
-	</div>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.14/moment-timezone-with-data.min.js"></script>
-	<script type="text/javascript" src="jquery-3.3.1.min.js"></script>
-	<script type="text/javascript" src="leaflet/leaflet-src.js"></script>
-	<script type="text/javascript" src="OWM/leaflet-openweathermap.js"></script>
-	<script type="text/javascript" src="app.js"></script>
-</body>
+			<div class="form-container">
+				<span class="js-add-icon add-icon"></span>		
+				<form action="#" class="js-location-form">
+				    <label for="location"></label>
+				    <input type="text" class="js-location-input location-input" placeholder="Enter the City or Zip Code">	<button class="js-add-btn add-btn  hidden" type="submit"><i class='icon-plus'></i></button>
+				</form>
+			</div>
+		</header>	
+		<div class ="main-wrap">
+			<nav class="js-sidebar sidebar" role="navigation">
+				<h3>My Locations</h3>
+				<ul class="js-side-nav side-nav"></ul>
+			</nav>	
+			<main role="main">
+				<div class="page-wrap">
+					<div class="wrap-one">
+						<div class="js-message message"></div>			
+						<div class="js-city-results city-results"></div>
+						<div class="js-weather-image weather-image"></div>	
+						<div class="js-temp-results temp-results"></div>
+					</div>
+					<div class="wrap-two">
+						<div class="col-1">	
+							<div class="js-weather-condition weather-condition"></div>
+						</div>
+						<div class="col-2">						
+							<div class="js-weather-results weather-results"></div>
+					    	<div class="js-forecast-results forecast-results"></div>
+					    </div>		
+					    <div id="preMap">
+					    	<div id="map"></div>
+					    </div>
+				    </div> 
+				</div>
+			</main>
+		</div>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.14/moment-timezone-with-data.min.js"></script>
+		<script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+		<script type="text/javascript" src="leaflet/leaflet-src.js"></script>
+		<script type="text/javascript" src="OWM/leaflet-openweathermap.js"></script>
+		<script type="text/javascript" src="app.js"></script>
+	</body>
 </html>

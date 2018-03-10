@@ -112,7 +112,7 @@ body {
 	font-family: 'Lato', sans-serif;
 	overflow-x: auto;
 	margin-top: 50px;
-	background-image: url(/images/bg-d.svg);
+	background-image: url(./images/bg-d.svg);
 	background-size: cover; 
     background-repeat: no-repeat;
     background-position: center center; 
@@ -776,7 +776,7 @@ body.expand {
 /*Night Mode*/
 
 body.night {
-	background-image: url(/images/bg-n.svg);
+	background-image: url(./images/bg-n.svg);
 }
 body.night header {
 	background-color: #22355e;

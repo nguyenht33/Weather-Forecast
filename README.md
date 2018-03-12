@@ -21,6 +21,9 @@ A weather forecast app that let users see the current weather of a location, and
 - Shows map of current location with different weather layers 
 - Store user's settings and locations for their next visit
 
+## Demo:
+[demo](https://nguyenht33.github.io/Weather-Forecast/)
+
 ## Built With
 - HTML
 - CSS

@@ -786,7 +786,6 @@ function convertToCelcius(temp) {
 function getFeelsLike(temp, humidity, windSpeed) {
   const heatIndex = getHeatIndex(temp, humidity);
   const windChill = getWindChill(temp, windSpeed);
-
   if (temp > 80) {
     return heatIndex;
   } else {

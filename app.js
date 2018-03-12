@@ -462,16 +462,16 @@ function checkDayNight(sunrise, sunset, icon) {
   if (time > sunriseTime && time < sunsetTime) {
     $('body').removeClass('night');
     if (icon !== '01d') {
-      $('.js-weather-image').html('<img src="images/sun-cloud.svg" alt="cloudy-day" class="weather-img">');
+      $('.js-weather-image').html('<img src="./images/sun-cloud.svg" alt="cloudy-day" class="weather-img">');
     } else {
       $('.js-weather-image').html('<img src="images/sun.svg" alt="clear-day" class="weather-img">');
     };
   } else {
     $('body').addClass('night');
     if (icon !== '01n') {
-      $('.js-weather-image').html('<img src="images/moon-cloud.svg" alt="cloudy-night" class="weather-img">');
+      $('.js-weather-image').html('<img src="./images/moon-cloud.svg" alt="cloudy-night" class="weather-img">');
     } else {    
-      $('.js-weather-image').html('<img src="images/moon.svg" alt="moon" class="weather-img">')
+      $('.js-weather-image').html('<img src="./images/moon.svg" alt="moon" class="weather-img">')
     };
   };
 }

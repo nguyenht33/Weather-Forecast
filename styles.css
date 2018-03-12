@@ -112,7 +112,7 @@ body {
 	font-family: 'Lato', sans-serif;
 	overflow-x: auto;
 	margin-top: 50px;
-	background-image: url(/images/bg-d.svg);
+	background-image: url(./images/bg-d.svg);
 	background-size: cover; 
     background-repeat: no-repeat;
     background-position: center center; 
@@ -612,7 +612,9 @@ main h3 {
 	color: #091f42;
 	display: flex;
   	flex-direction: column;
+  	justify-content: space-between;
 	width: 100%;
+	height: 100%;
 	padding: 20px;
 	letter-spacing: 1px;
 	background-color: rgba(153,191,170, 0.4);
@@ -776,7 +778,7 @@ body.expand {
 /*Night Mode*/
 
 body.night {
-	background-image: url(/images/bg-n.svg);
+	background-image: url(./images/bg-n.svg);
 }
 body.night header {
 	background-color: #22355e;

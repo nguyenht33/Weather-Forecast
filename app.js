@@ -107,6 +107,7 @@ function init() {
   getUnitSettingsFromStorage();
   getListFromLocalStorage();
   getCurrentFromStorage();
+      console.log('starting');
   displaySidebar();  
   displayLocationsList(); 
   displaySearchbar();

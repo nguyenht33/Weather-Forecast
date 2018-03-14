@@ -152,7 +152,7 @@ function getCurrentFromStorage() {
     currentCity = parsedCurrent;
     displayWeatherReports();
   } else {
-    geolocation();
+    getGeoLocation();
   }
 }
 
@@ -525,7 +525,9 @@ function displayLocationsList() {
             </li>`
   });
   $('.js-side-nav').html(cityItems);
-  displayCurrentCityMarker();
+  if (currentCity) {
+    displayCurrentCityMarker();
+  };
 }
 
 function displayCurrentCityMarker() {

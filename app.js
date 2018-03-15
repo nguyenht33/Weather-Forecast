@@ -11,9 +11,20 @@ let locationsList = [];
 let tempSettingF;
 let tempSettingC;
 
-// ajax functions //
+function ajaxStartLoader() {
+  $(document).ajaxStart(function() {
+    $('.loader').show();
+  });
+}
+
+function ajaxStopLoader() {
+  $(document).ajaxStop(function() {
+    $('.loader').hide();
+  });
+}
+
 function getReverseLocation(latlng) {
-    let data = {
+  let data = {
     latlng: latlng,
     result_type: 'locality',
     key: geoKey
@@ -104,6 +115,8 @@ function getForecast() {
 
 // start app
 function init() {
+  ajaxStartLoader();
+  ajaxStopLoader();
   getUnitSettingsFromStorage();
   getListFromLocalStorage();
   getCurrentFromStorage();
@@ -218,7 +231,6 @@ function addLocation(location) {
            setCurrentToStorage();
          }; 
       };
-
       displayLocationsList();
       displayWeatherReports(); 
     };
@@ -298,11 +310,13 @@ function handleAddLocation() {
   $('.js-location-form').on('submit', function(e) {
     e.preventDefault();
     if ($('.js-location-input').val() === '') {
+      $('.js-location-input').blur();
       closeSearchbar();
     } else {
-      const locationTarget = $(event.currentTarget).find('.js-location-input');
+      const locationTarget = $(e.currentTarget).find('.js-location-input');
       const address = locationTarget.val();
       $('.js-location-input').val(''); 
+      $('.js-location-input').blur();
       closeSearchbar();   
       getLocation(address);
     }
@@ -311,13 +325,17 @@ function handleAddLocation() {
 
 function handleLocationClicked() {
   $('.js-side-nav').on('click', 'li', function() {
+    ajaxStartLoader();
+
     const itemIndex = $(this).closest('li').attr('id');  
     currentCity = locationsList[itemIndex];
 
     displayCurrentCityMarker();
     setCurrentToStorage(currentCity);
+    $('html, body').animate({scrollTop: 0}, '1000');
     displayWeatherReports();
     closeSidebar();
+    ajaxStopLoader();
   });
 }
 
@@ -643,7 +661,6 @@ function generateForecast(forecasts) {
   const forecastObj = forecasts.list;
   const forecastArray = [];
 
-  // loop thru JSON data to pull data of day, temp, weather & icon
   for (let key in forecastObj) {
     if (forecastObj.hasOwnProperty(key)) {
       var day = getDay(forecastObj[key].dt_txt);

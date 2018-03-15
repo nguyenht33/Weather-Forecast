@@ -19,17 +19,26 @@
 				<span class="js-add-icon add-icon"></span>		
 				<form action="#" class="js-location-form">
 				    <label for="location"></label>
-				    <input type="text" class="js-location-input location-input" placeholder="Enter the City or Zip Code">	<button class="js-add-btn add-btn  hidden" type="submit"><i class='icon-plus'></i></button>
+				    <input type="text" class="js-location-input location-input" placeholder="Enter the City or Zip Code">	
+				    <button class="js-add-btn add-btn  hidden" type="submit"><i class='icon-plus'></i></button>
 				</form>
 			</div>
 		</header>	
 		<div class ="main-wrap">
+			<div class="loader">		
+				<div class="spinner">
+					<div class="bounce1"></div>
+					<div class="bounce2"></div>
+					<div class="bounce3"></div>
+				</div>
+			</div>
 			<nav class="js-sidebar sidebar" role="navigation">
 				<h3>My Locations</h3>
 				<ul class="js-side-nav side-nav"></ul>
 			</nav>	
 			<main role="main">
 				<div class="page-wrap">
+
 					<div class="wrap-one">
 						<div class="js-message message"></div>			
 						<div class="js-city-results city-results"></div>

@@ -129,12 +129,12 @@ header {
 }
 
 .loader {
+	display: none;
 	position: fixed;
 	top: 35%;
 	left: 0px;
 	width: 100%;
 	height: 100%;
-	overflow: hidden;
 	z-index: 100;
 }
 
@@ -275,6 +275,24 @@ input[type="text"]::placeholder {
 	z-index: 10;
 }
 
+.close-btn {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	width: 35px;
+	height: 35px;
+	font-size: 25px;
+	color: #267BA5;
+	background-color: transparent;
+	border:none;
+	z-index: 50;
+	cursor: pointer;
+}
+
+.close-btn:hover {
+	color: #F8931E;
+}
+
 .sidebar h3 {
 	display: flex;
 	justify-content: center;
@@ -383,35 +401,6 @@ ul li {
 	height: 3px;
 	background-color: #267ba5;
 	transition: .3s;
-}
-
-.sidebar-btn.toggle span {
-	background: transparent;
-}
-
-.sidebar-btn.toggle span:before {
-	top: 0;
-	transform: rotate(45deg);
-}
-
-.sidebar-btn.toggle span:after {
-	top: 0;
-	transform: rotate(-45deg);
-}
-
-.sidebar-btn.toggle span:hover::before {
-	background-color: #F8931E;
-}
-
-.sidebar-btn.toggle span:hover::after {
-	background-color: #F8931E;
-}
-
-.sidebar-btn.close {
-	right: 20px;
-    padding: 0;
-    height: 35px;
-    width: 35px;
 }
 
 .page-wrap {
@@ -929,19 +918,14 @@ body.night .sidebar-btn span:after {
 	background-color: #8eb1e5;
 	transition: .3s;
 }
+body.night .close-btn {
+	color: #8eb1e5;
+}
+body.night .close-btn:hover {
+	color: #F36635;
+}
 body.night .sidebar-btn.toggle span {
 	background: transparent;
-}
-body.night .sidebar-btn.toggle span:before {
-	top: 0;
-	transform: rotate(45deg);
-}
-body.night .sidebar-btn.toggle span:after {
-	top: 0;
-	transform: rotate(-45deg);
-}
-body.night .sidebar-btn.close {
-	right: 20px;
 }
 body.night .message.show {
 	background-color: rgba(75,70,106,0.7);
@@ -1088,9 +1072,6 @@ body.night #map.expand {
 	.sidebar {
 		width: 60%;
 	}
-	.bar-container.close {
-		right: 30%;
-	}
 	.page-wrap {
 		padding: 20px;
 	}
@@ -1126,9 +1107,6 @@ body.night #map.expand {
 	}
 	.sidebar {
 		width: 50%;
-	}
-	.bar-container.close {
-		right: 43%;
 	}
 	.page-wrap {
 		padding: 20px;
@@ -1192,9 +1170,6 @@ body.night #map.expand {
 	.sidebar {
 		width: 40%;
 	}
-	.bar-container.close {
-		right: 53%;
-	}
 	.page-wrap {
 		padding: 20px 5% 10px 5%;
 	}
@@ -1230,9 +1205,6 @@ body.night #map.expand {
 	.sidebar {
 		width: 30%;
 	}
-	.bar-container.close {
-		right: 65%;
-	}
 	.page-wrap {
 		padding: 20px 20% 20px 20%;
 	}
@@ -1244,9 +1216,6 @@ body.night #map.expand {
 @media only screen and (min-width: 2560px) {
 	.sidebar {
 		width: 20%;
-	}
-	.bar-container.close {
-		right: 77%;
 	}
 	.page-wrap {
 		padding: 20px 30% 20px 30%;

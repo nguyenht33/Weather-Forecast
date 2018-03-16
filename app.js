@@ -13,13 +13,13 @@ let tempSettingC;
 
 function ajaxStartLoader() {
   $(document).ajaxStart(function() {
-    $('.loader').show();
+    $('.loader').removeClass('loading');
   });
 }
 
 function ajaxStopLoader() {
   $(document).ajaxStop(function() {
-    $('.loader').hide();
+    $('.loader').addClass('loading');
   });
 }
 
@@ -115,12 +115,11 @@ function getForecast() {
 
 // start app
 function init() {
-  ajaxStartLoader();
-  ajaxStopLoader();
   getUnitSettingsFromStorage();
   getListFromLocalStorage();
   getCurrentFromStorage();
-  displaySidebar();  
+  displaySidebar(); 
+  closeSidebarClicked(); 
   displayLocationsList(); 
   displaySearchbar();
   displayUnitSettings();
@@ -859,13 +858,25 @@ function getKmh(mph) {
   return Math.round(km);
 }
 
+function displaySidebar() {
+  $('.js-sidebar-btn').click(function() {
+    toggleResize();
+    $('.js-sidebar').toggleClass('active');
+    $('.main-wrap').toggleClass('slide-right');
+    $('header').toggleClass('slide-right');  
+  });
+}
+
+function closeSidebarClicked() {
+  $('.sidebar-header button').on('click', function() {
+    closeSidebar();
+  })
+}
+
 function closeSidebar() {
   $('.main-wrap').toggleClass('slide-right');
   $('.js-sidebar').toggleClass('active');
   $('header').toggleClass('slide-right');
-  $('.js-sidebar-btn').toggleClass('toggle');
-  $('.js-sidebar-btn').toggleClass('close');
-  $('.bar-container').toggleClass('close');
   removeResize();
 }
 
@@ -883,18 +894,6 @@ function removeResize() {
   $('.details-container').removeClass('resize');
   $('.page-wrap').removeClass('resize');
   $('.current-condition h2').removeClass('resize');
-}
-
-function displaySidebar() {
-  $('.js-sidebar-btn').click(function() {
-    toggleResize();
-    $('.js-sidebar').toggleClass('active');
-    $('.bar-container').toggleClass('close');
-    $('.js-sidebar-btn').toggleClass('toggle');
-    $('.js-sidebar-btn').toggleClass('close');
-    $('.main-wrap').toggleClass('slide-right');
-    $('header').toggleClass('slide-right');  
-  });
 }
 
 function closeSearchbar() {

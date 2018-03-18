@@ -11,18 +11,6 @@ let locationsList = [];
 let tempSettingF;
 let tempSettingC;
 
-function ajaxStartLoader() {
-  $(document).ajaxStart(function() {
-    $('.loader').removeClass('loading');
-  });
-}
-
-function ajaxStopLoader() {
-  $(document).ajaxStop(function() {
-    $('.loader').addClass('loading');
-  });
-}
-
 function getReverseLocation(latlng) {
   let data = {
     latlng: latlng,
@@ -41,6 +29,7 @@ function getReverseLocation(latlng) {
 }
 
 function getLocation(address) {
+  startLoader();
   let data = {
     address: address,
     sensor: false,
@@ -115,6 +104,8 @@ function getForecast() {
 
 // start app
 function init() {
+  getSessionStorage();
+  setSessionStorage();
   getUnitSettingsFromStorage();
   getListFromLocalStorage();
   getCurrentFromStorage();
@@ -129,6 +120,38 @@ function init() {
   handleLocationClicked();
   handleLocationDelete();
   handleTempSettingClicked();
+}
+
+function getSessionStorage() {
+  const isVisited = sessionStorage.getItem('visited');
+  if (!isVisited) {
+    const content = `<div class="splash">
+                        <h1 class="animated bounceInDown">your
+                        </br>
+                        <span>weather</span>
+                        </br> 
+                        <span>report</span></h1>
+                     </div>`
+    $('body').addClass('noScroll');
+    $('body').append(content);
+
+    $('.splash').delay(3000).fadeOut('3000', e => {
+        $(this).addClass('remove-splash');
+            $('body').removeClass('noScroll');
+    });
+  }
+}
+
+function setSessionStorage() {
+  sessionStorage.setItem('visited', 'true');
+}
+
+function startLoader() {
+  $('.loader').addClass('loading');
+}
+
+function stopLoader() {
+  $('.loader').removeClass('loading');
 }
 
 function getUnitSettingsFromStorage() {
@@ -324,7 +347,7 @@ function handleAddLocation() {
 
 function handleLocationClicked() {
   $('.js-side-nav').on('click', 'li', function() {
-    ajaxStartLoader();
+    startLoader();
 
     const itemIndex = $(this).closest('li').attr('id');  
     currentCity = locationsList[itemIndex];
@@ -334,7 +357,7 @@ function handleLocationClicked() {
     $('html, body').animate({scrollTop: 0}, '1000');
     displayWeatherReports();
     closeSidebar();
-    ajaxStopLoader();
+    stopLoader();
   });
 }
 
@@ -653,6 +676,7 @@ function displayForecast(dailyForecast) {
   });
   $('.js-forecast-results').html(template);
   $('.js-forecast-results').prepend(`<h3>Forecast</h3>`);
+  stopLoader();
 }
 
 // calculating 5 days forecast based on OWM's every 3hrs data //

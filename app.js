@@ -11,9 +11,8 @@ let locationsList = [];
 let tempSettingF;
 let tempSettingC;
 
-// ajax functions //
 function getReverseLocation(latlng) {
-    let data = {
+  let data = {
     latlng: latlng,
     result_type: 'locality',
     key: geoKey
@@ -30,6 +29,7 @@ function getReverseLocation(latlng) {
 }
 
 function getLocation(address) {
+  startLoader();
   let data = {
     address: address,
     sensor: false,
@@ -104,11 +104,13 @@ function getForecast() {
 
 // start app
 function init() {
+  getSessionStorage();
+  setSessionStorage();
   getUnitSettingsFromStorage();
   getListFromLocalStorage();
   getCurrentFromStorage();
-      console.log('starting');
-  displaySidebar();  
+  displaySidebar(); 
+  closeSidebarClicked(); 
   displayLocationsList(); 
   displaySearchbar();
   displayUnitSettings();
@@ -120,7 +122,38 @@ function init() {
   handleTempSettingClicked();
 }
 
-// get unit settings from previous session 
+function getSessionStorage() {
+  const isVisited = sessionStorage.getItem('visited');
+  if (!isVisited) {
+    const content = `<div class="splash">
+                        <h1 class="animated bounceInDown">your
+                        </br>
+                        <span>weather</span>
+                        </br> 
+                        <span>report</span></h1>
+                     </div>`
+    $('body').addClass('noScroll');
+    $('body').append(content);
+
+    $('.splash').delay(3000).fadeOut('3000', e => {
+        $(this).addClass('remove-splash');
+            $('body').removeClass('noScroll');
+    });
+  }
+}
+
+function setSessionStorage() {
+  sessionStorage.setItem('visited', 'true');
+}
+
+function startLoader() {
+  $('.loader').addClass('loading');
+}
+
+function stopLoader() {
+  $('.loader').removeClass('loading');
+}
+
 function getUnitSettingsFromStorage() {
   let storedSettingF = localStorage.getItem('tempSETTINGF');
   let storedSettingC = localStorage.getItem('tempSETTINGC');
@@ -312,15 +345,37 @@ function displayWeatherReports() {
   getMap();
 }
 
+// add items functions //
+function handleAddLocation() {
+  $('.js-location-form').on('submit', function(e) {
+    e.preventDefault();
+    if ($('.js-location-input').val() === '') {
+      $('.js-location-input').blur();
+      closeSearchbar();
+    } else {
+      const locationTarget = $(e.currentTarget).find('.js-location-input');
+      const address = locationTarget.val();
+      $('.js-location-input').val(''); 
+      $('.js-location-input').blur();
+      closeSearchbar();   
+      getLocation(address);
+    }
+  });
+}
+
 function handleLocationClicked() {
   $('.js-side-nav').on('click', 'li', function() {
+    startLoader();
+
     const itemIndex = $(this).closest('li').attr('id');  
     currentCity = locationsList[itemIndex];
 
     displayCurrentCityMarker();
     setCurrentToStorage(currentCity);
+    $('html, body').animate({scrollTop: 0}, '1000');
     displayWeatherReports();
     closeSidebar();
+    stopLoader();
   });
 }
 
@@ -643,6 +698,7 @@ function displayForecast(dailyForecast) {
   });
   $('.js-forecast-results').html(template);
   $('.js-forecast-results').prepend(`<h3>Forecast</h3>`);
+  stopLoader();
 }
 
 // calculating 5 days forecast based on OWM's every 3hrs data //
@@ -650,7 +706,6 @@ function generateForecast(forecasts) {
   const forecastObj = forecasts.list;
   const forecastArray = [];
 
-  // loop thru JSON data to pull data of day, temp, weather & icon
   for (let key in forecastObj) {
     if (forecastObj.hasOwnProperty(key)) {
       var day = getDay(forecastObj[key].dt_txt);
@@ -848,13 +903,42 @@ function getKmh(mph) {
   return Math.round(km);
 }
 
-// UI tasks
-function displaySearchbar() {
-  $('.js-add-icon').click(function() {
-    $('.js-location-input').toggleClass('open');
-    $('.js-add-btn').toggleClass('hidden');
-    $('.js-add-icon').toggleClass('hidden');
+function displaySidebar() {
+  $('.js-sidebar-btn').click(function() {
+    toggleResize();
+    $('.js-sidebar').toggleClass('active');
+    $('.main-wrap').toggleClass('slide-right');
+    $('header').toggleClass('slide-right');  
   });
+}
+
+function closeSidebarClicked() {
+  $('.sidebar-header button').on('click', function() {
+    closeSidebar();
+  })
+}
+
+function closeSidebar() {
+  $('.main-wrap').toggleClass('slide-right');
+  $('.js-sidebar').toggleClass('active');
+  $('header').toggleClass('slide-right');
+  removeResize();
+}
+
+function toggleResize() {
+  $('.main-wrap').toggleClass('resize');
+  $('.col-2').toggleClass('resize');
+  $('.details-container').toggleClass('resize');
+  $('.page-wrap').toggleClass('resize');
+  $('.current-condition h2').toggleClass('resize');
+}
+
+function removeResize() {
+  $('.main-wrap').removeClass('resize');
+  $('.col-2').removeClass('resize');
+  $('.details-container').removeClass('resize');
+  $('.page-wrap').removeClass('resize');
+  $('.current-condition h2').removeClass('resize');
 }
 
 function closeSearchbar() {
@@ -874,42 +958,12 @@ function closeMessage() {
   });
 }
 
-function displaySidebar() {
-  $('.js-sidebar-btn').click(function() {
-    toggleResize();
-    $('.js-sidebar').toggleClass('active');
-    $('.bar-container').toggleClass('close');
-    $('.js-sidebar-btn').toggleClass('toggle');
-    $('.js-sidebar-btn').toggleClass('close');
-    $('.main-wrap').toggleClass('slide-right');
-    $('header').toggleClass('slide-right');  
+function displaySearchbar() {
+  $('.js-add-icon').click(function() {
+    $('.js-location-input').toggleClass('open');
+    $('.js-add-btn').toggleClass('hidden');
+    $('.js-add-icon').toggleClass('hidden');
   });
-}
-
-function closeSidebar() {
-  $('.main-wrap').toggleClass('slide-right');
-  $('.js-sidebar').toggleClass('active');
-  $('header').toggleClass('slide-right');
-  $('.js-sidebar-btn').toggleClass('toggle');
-  $('.js-sidebar-btn').toggleClass('close');
-  $('.bar-container').toggleClass('close');
-  removeResize();
-}
-
-function toggleResize() {
-  $('.main-wrap').toggleClass('resize');
-  $('.col-2').toggleClass('resize');
-  $('.details-container').toggleClass('resize');
-  $('.page-wrap').toggleClass('resize');
-  $('.current-condition h2').toggleClass('resize');
-}
-
-function removeResize() {
-  $('.main-wrap').removeClass('resize');
-  $('.col-2').removeClass('resize');
-  $('.details-container').removeClass('resize');
-  $('.page-wrap').removeClass('resize');
-  $('.current-condition h2').removeClass('resize');
 }
 
 function displayUnitSettings() {

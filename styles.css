@@ -536,6 +536,14 @@ main h3 {
 	position: relative;
 }
 
+.down-arrow {
+	position: absolute;
+	display: block;
+	bottom: 4%;
+	margin: 4px;
+	left: 50%;
+}
+
 .weather-image {
 	display: flex;
 	justify-content: center;

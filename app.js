@@ -24,7 +24,7 @@ function getReverseLocation(latlng) {
     url: geoURL,
     data: data,
     async: false,
-    success: addLocation       
+    success: addLocation
   });
 }
 
@@ -42,7 +42,7 @@ function getLocation(address) {
     url: geoURL,
     data: data,
     async: false,
-    success: addLocation           
+    success: addLocation
   });
 }
 
@@ -109,9 +109,9 @@ function init() {
   getUnitSettingsFromStorage();
   getListFromLocalStorage();
   getCurrentFromStorage();
-  displaySidebar(); 
-  closeSidebarClicked(); 
-  displayLocationsList(); 
+  displaySidebar();
+  closeSidebarClicked();
+  displayLocationsList();
   displaySearchbar();
   displayUnitSettings();
   closeMessage();
@@ -125,21 +125,22 @@ function init() {
 function getSessionStorage() {
   const isVisited = sessionStorage.getItem('visited');
   if (!isVisited) {
-    const content = `<div class="splash">
-                        <h1 class="animated bounceInDown">your
-                        </br>
-                        <span>weather</span>
-                        </br> 
-                        <span>report</span></h1>
-                     </div>`
+    const message = `<div class="splash">
+                      <div class="splash-message animated bounceInDown">
+                       <h1>Your Weather Report</h1>
+                          <p>
+                            get started: click <span>'+'</span> to add a location.
+                          </p>
+                          <button id="close-splash">Got It!</button>
+                        </div>
+                     </div>`;
     $('body').addClass('noScroll');
-    $('body').append(content);
-
-    $('.splash').delay(3000).fadeOut('3000', e => {
-        $(this).addClass('remove-splash');
-            $('body').removeClass('noScroll');
-    });
+    $('body').prepend(message);
   }
+  $('#close-splash').click(function(){
+        $('.splash').addClass('remove-splash');
+        $('body').removeClass('noScroll');
+  })
 }
 
 function setSessionStorage() {
@@ -198,7 +199,7 @@ function setListToStorage() {
 function setCurrentToStorage() {
   if (currentCity) {
     localStorage.setItem('currentCITY', JSON.stringify(currentCity));
-  }; 
+  };
 }
 
 function setUnitSettingsToStorage() {
@@ -210,7 +211,7 @@ function setUnitSettingsToStorage() {
 function getGeoLocation() {
   if (!navigator.geolocation) {
     return getDefaultCity();
-  } 
+  }
 
   function success(position) {
     const lat = position.coords.latitude;
@@ -229,7 +230,7 @@ function getGeoLocation() {
 // input New York City as default if user denies geolocation
 function getDefaultCity() {
   const lat = 40.7127753;
-  const lon = -74.0059728;    
+  const lon = -74.0059728;
   const latlng = lat + ' '+ lon;
   getReverseLocation(latlng);
 }
@@ -251,10 +252,10 @@ function addLocation(location) {
          currentCity = locationsList[locationsList.length - 1];
          if (currentCity !== undefined) {
            setCurrentToStorage();
-         }; 
+         };
       };
       displayLocationsList();
-      displayWeatherReports(); 
+      displayWeatherReports();
     };
   } else {
     displayErrorMessage();
@@ -273,14 +274,14 @@ function filterLocationInput(location) {
     let types = addressComponents[i].types;
     addressComponentsList.push({ name: name, types: types });
   };
-  const address = addressComponentsList.find(filterAddress); 
+  const address = addressComponentsList.find(filterAddress);
 
   if (results.length > 1) {
     return error = "err1";
   } else if (resultsTypes.indexOf('route') >= 0) {
     return error = "err2";
   } else if (address) {
-    return cityName = address.name;  
+    return cityName = address.name;
   } else {
     return error = "err2";
   }
@@ -337,9 +338,9 @@ function handleAddLocation() {
     } else {
       const locationTarget = $(e.currentTarget).find('.js-location-input');
       const address = locationTarget.val();
-      $('.js-location-input').val(''); 
+      $('.js-location-input').val('');
       $('.js-location-input').blur();
-      closeSearchbar();   
+      closeSearchbar();
       getLocation(address);
     }
   });
@@ -349,7 +350,7 @@ function handleLocationClicked() {
   $('.js-side-nav').on('click', 'li', function() {
     startLoader();
 
-    const itemIndex = $(this).closest('li').attr('id');  
+    const itemIndex = $(this).closest('li').attr('id');
     currentCity = locationsList[itemIndex];
 
     displayCurrentCityMarker();
@@ -379,7 +380,7 @@ function handleLocationDelete() {
       setCurrentToStorage();
       getCurrentFromStorage();
       displayCurrentCityMarker();
-    } 
+    }
   });
 }
 
@@ -402,8 +403,8 @@ function handleTempSettingClicked() {
 
     $(this).attr('disabled', true);
     $('.celcius').attr('disabled', false);
-    $('.units').toggleClass('show'); 
-    $('.units').toggleClass('hidden'); 
+    $('.units').toggleClass('show');
+    $('.units').toggleClass('hidden');
   });
 }
 
@@ -435,7 +436,7 @@ function handleCelciusConversion() {
     $('.forecast-temp').each(function(index, temp) {
       const convertedTemp = convertToCelcius($(temp).text().slice(0, -1));
       $(this).html(`${convertedTemp}&#176`);
-    }); 
+    });
 }
 
 function handleFahrenheitConversion() {
@@ -510,7 +511,7 @@ function checkDayNight(sunrise, sunset, icon) {
     $('body').addClass('night');
     if (icon !== '01n') {
       $('.js-weather-image').html('<img src="./images/moon-cloud.svg" alt="cloudy-night" class="weather-img">');
-    } else {    
+    } else {
       $('.js-weather-image').html('<img src="./images/moon.svg" alt="moon" class="weather-img">')
     };
   };
@@ -526,14 +527,14 @@ function getCurrentTime(timeZone) {
   const day = moment();
   const zone = timeZone.timeZoneId;
   currentTimeZone = zone;
-  const date = day.tz(zone).format('ddd, MMMM d');
+  const date = day.tz(zone).format('ddd, MMM d');
   const hour = day.tz(zone).format('h:mm');
   displayCity(date, hour);
 }
 
 function updateTime() {
-  const day = moment();   
-  const date = day.tz(currentTimeZone).format('ddd, MMMM d');
+  const day = moment();
+  const date = day.tz(currentTimeZone).format('ddd, MMM d');
   const hour = day.tz(currentTimeZone).format('h:mm');
   $('.date p').first().html(hour);
   $('.date p').last().html(date);
@@ -592,7 +593,7 @@ function displayWeather(weather) {
   const wind = weather.wind.speed;
   const windSpeed = checkWindSpeedSettings(wind);
   const feelLike = getFeelsLike(main.temp, main.humidity, wind);
-  const feelLikeTemp = checkTempSettings(feelLike);  
+  const feelLikeTemp = checkTempSettings(feelLike);
   const visibility = checkVisibilitySettings(weather.visibility);
 
   // sunrise / sunset
@@ -607,7 +608,7 @@ function displayWeather(weather) {
                               <h2>${weather.weather[0].description}</h2>
                             </div>`
 
-  const weatherDetails = `<div class="details-container">                              
+  const weatherDetails = `<div class="details-container">
                             <div class="weather-details">
                               <h3>Details</h3>
                               <ul>
@@ -655,9 +656,9 @@ function displayTemperature(currentTemp, currentMaxTemp, currentMinTemp) {
                                   <div class="units hidden">
                                     <input type="button" value="F&#176" class="fahrenheit unit-btn" ${buttonF}>
                                     <input type="button" value="C&#176" class="celcius unit-btn" ${buttonC}>
-                                  </div>                              
+                                  </div>
                                   <span data-icon="&#xe001;" class="icon-thermometer"></span>
-                                </div> 
+                                </div>
                               </div>`;
   $('.js-temp-results').html(currentTemperature);
 }
@@ -725,11 +726,11 @@ function getAverageTemp(forecasts) {
   const commonWeather = mostCommonWeatherByDay(forecasts);
   const commonIcon = mostCommonIconByDay(forecasts);
   const results = concatAverageForecasts(tempSums, tempCounts, commonWeather, commonIcon);
-  
+
   return results;
 }
 
-// concat results 
+// concat results
 function concatAverageForecasts(temp, tempCount, weather, icon) {
   const tempResults = [], weatherResults = [], iconResults = [], firstResults = [], finalResults = [];
 
@@ -757,17 +758,17 @@ function concatAverageForecasts(temp, tempCount, weather, icon) {
 function mostCommonWeatherByDay(data) {
   const valuesByDay = data.reduce((acc, value) => {
     const { day, temp, weather, icon } = value;
-    
+
     if (!acc[day]) acc[day] = [];
     acc[day].push(weather);
     return acc;
   }, {})
-  
+
   const ret = Object.keys(valuesByDay).reduce((acc, key) => {
     acc[key] = mostCommonOccurence(valuesByDay[key]);
     return acc;
   }, {})
-  
+
   return ret;
 }
 
@@ -775,17 +776,17 @@ function mostCommonWeatherByDay(data) {
 function mostCommonIconByDay(data) {
   const valuesByDay = data.reduce((acc, value) => {
     const { day, temp, weather, icon } = value;
-    
+
     if (!acc[day]) acc[day] = [];
     acc[day].push(icon);
     return acc;
   }, {})
-  
+
   const ret = Object.keys(valuesByDay).reduce((acc, key) => {
     acc[key] = mostCommonOccurence(valuesByDay[key]);
     return acc;
   }, {})
-  
+
   return ret;
 }
 
@@ -793,18 +794,18 @@ function mostCommonIconByDay(data) {
 function mostCommonOccurence(arr = []) {
   const totals = arr.reduce((acc, val) => {
     if (!acc[val]) {
-      acc[val] = 1; 
-      return acc; 
+      acc[val] = 1;
+      return acc;
     }
-    
+
     acc[val] += 1;
     return acc;
   }, {});
-  
+
   const keys = Object.keys(totals)
   const values = keys.map(name => totals[name]);
   const max = Math.max(...values);
-  
+
   return keys.find(key => totals[key] === max);
 }
 
@@ -832,8 +833,8 @@ function getFeelsLike(temp, humidity, windSpeed) {
 
 function getHeatIndex(temp, humidity) {
   let T = temp, rh = humidity, heatIndex;
-  heatIndex = -42.379 + (2.04901523 * T) + (10.14333127 * rh) 
-           - (0.22475541 * T * rh) - (6.83783 * (Math.pow(10, -3)) * (Math.pow(T, 2))) 
+  heatIndex = -42.379 + (2.04901523 * T) + (10.14333127 * rh)
+           - (0.22475541 * T * rh) - (6.83783 * (Math.pow(10, -3)) * (Math.pow(T, 2)))
            - (5.481717 * (Math.pow(10, -2)) * (Math.pow(rh, 2))) + (1.22874 * (Math.pow(10, -3)) * (Math.pow(T, 2)) * rh)
            + (8.5282 * (Math.pow(10, -4)) * T * (Math.pow(rh, 2))) - (1.99 * (Math.pow(10, -6)) * (Math.pow(T, 2)) * (Math.pow(rh, 2)));
   return Math.round(heatIndex);
@@ -864,7 +865,7 @@ function getMilesFromKilometers(kilometers) {
 
 function getKilometersFromMeters(meter) {
   const km = meter / 1000;
-  return Math.round(km); 
+  return Math.round(km);
 }
 
 function getKilometersFromMiles(kilometers) {
@@ -887,7 +888,7 @@ function displaySidebar() {
     toggleResize();
     $('.js-sidebar').toggleClass('active');
     $('.main-wrap').toggleClass('slide-right');
-    $('header').toggleClass('slide-right');  
+    $('header').toggleClass('slide-right');
   });
 }
 
@@ -977,14 +978,14 @@ function getMap() {
     const mapContainer = `<h3>Map<span data-icon="&#xe001;" class="icon-expand"></span></h3>
                           <div id="map"></div>`
     $(mapContainer).appendTo('#preMap');
-  } 
+  }
   displayMap(currentCity.lat, currentCity.lon);
 }
 
 function displayMap(lat, lon) {
   let osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18, 
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>' 
+    maxZoom: 18,
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
   });
 
   let clouds = L.OWM.clouds({showLegend: false, opacity: 0.5, appId: openKey});
@@ -996,9 +997,9 @@ function displayMap(lat, lon) {
 
   let map = L.map('map', { center: new L.LatLng(lat, lon), zoom: 10, layers: [osm] });
   let baseMaps = { "OSM Standard": osm };
-  let overlayMaps = { 
-    "Clouds": clouds, 
-    "Precipitation": precipitation, 
+  let overlayMaps = {
+    "Clouds": clouds,
+    "Precipitation": precipitation,
     "Pressure": pressure,
     "Temp": temp,
     "Wind": wind,

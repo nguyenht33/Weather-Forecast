@@ -112,16 +112,16 @@ body {
 	margin-top: 50px;
 	background-color: #E1E7C3;
 	background-image: url(./images/bg-d.svg);
-	background-size: cover; 
+	background-size: cover;
     background-repeat: no-repeat;
-    background-position: center center; 
+    background-position: center center;
 }
 
 body.noScroll {
 	overflow: hidden;
 }
 
-header {	
+header {
 	display: flex;
 	align-items: center;
 	position: fixed;
@@ -133,20 +133,37 @@ header {
 }
 
 .splash {
-	display: block;
+	display: flex;
+  justify-content: center;
 	position: fixed;
 	top: 0px;
 	left: 0px;
 	width: 100%;
 	height: 100%;
-	padding: 20px;
 	z-index: 120;
 	color: #72001d;
 	background-image: url(./images/bg-d.svg);
-	background-size: cover; 
-    background-repeat: no-repeat;
-    background-position: center center; 
-	opacity: .8;
+	background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+	opacity: .9;
+}
+
+.splash-message {
+  height: 100px;
+  padding: 20px;
+  position: fixed;
+  top: 35%;
+}
+
+.splash-message p {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  background-color: white;
+  padding: 15px 6px;
 }
 
 .remove-splash {
@@ -155,24 +172,29 @@ header {
 
 .splash h1 {
 	font-family: 'Comfortaa', cursive;
-	font-size: 30px;
-	margin: 0 auto;
-	display: inline;
-	text-align: center;
-	width: 50%;
-	position: absolute;
-	top: 43%;
-	left: 25%;
+	font-size: 25px;
+	margin: 0 0 10px 0;
 	text-shadow: 2px 2px 4px #FFF;
-	z-index: 122;
+  text-align: center;
 }
 
-.splash h1 span {
-	font-size: 37px;
+#close-splash {
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  padding: 15px 3px;
+  color: #72001d;
+  background-color: #F8931E;
+  border: none;
 }
 
-.splash h1 span:nth-child(2) {
-	font-size: 42px;
+#close-splash:hover {
+  background-color: #ff7d32;
+}
+
+.splash span {
+  font-size: 15px;
+  color: black;
 }
 
 .animated {
@@ -244,7 +266,6 @@ header {
   width: 20px;
   height: 20px;
   background-color: #74C2F7;
-
   border-radius: 100%;
   display: inline-block;
   -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
@@ -267,10 +288,10 @@ header {
 }
 
 @keyframes sk-bouncedelay {
-  0%, 80%, 100% { 
+  0%, 80%, 100% {
     -webkit-transform: scale(0);
     transform: scale(0);
-  } 40% { 
+  } 40% {
     -webkit-transform: scale(1.0);
     transform: scale(1.0);
   }
@@ -294,7 +315,7 @@ header {
 	margin-right: 14px;
 	display: flex;
 	justify-content: space-between;
-	align-items: center;	
+	align-items: center;
 }
 
 .location-input {
@@ -359,7 +380,7 @@ input[type="text"]::placeholder {
 	position: fixed;
 	top: 0px;
 	left: -85%;
-	background: white; 
+	background: white;
 	width: 85%;
 	height: 100%;
 	transition: .3s;
@@ -622,6 +643,7 @@ main h3 {
 	font-size: 80px;
 	line-height: 70px;
 	font-weight: 300;
+  text-align: center;
 }
 
 .date p:nth-child(2) {
@@ -632,7 +654,7 @@ main h3 {
 
 .temp-results {
 	width: 100%;
-	position: absolute;	
+	position: absolute;
 	bottom: 4%;
 }
 
@@ -682,7 +704,7 @@ main h3 {
 	font-size: 16px;
 	width: 35px;
 	height: 35px;
-	border-radius: 50%;	
+	border-radius: 50%;
 	background-color: #e2b1d3;
 	padding: 1px 0 0 3px;
 	margin-bottom: 5px;
@@ -778,7 +800,7 @@ main h3 {
 	padding: 5px 0;
 }
 
-.weather-details li {	
+.weather-details li {
 	display: flex;
 	justify-content: space-between;
 	padding: 4px 0;
@@ -951,7 +973,7 @@ body.night .add-icon {
 	background-color: transparent;
 }
 body.night .sidebar {
-	background-color: #22355e; 
+	background-color: #22355e;
 }
 body.night .sidebar h3 {
 	border-bottom: 2px solid rgba(108,77,111,.5);
@@ -1143,7 +1165,7 @@ body.night #preMap h3 {
 body.night .icon-expand {
 	color: #efdaae;
 }
-body.night #preMap.expand {	
+body.night #preMap.expand {
 	position:fixed;
 	top: 0px;
 	left: 0px;
@@ -1189,12 +1211,6 @@ body.night #map.expand {
 	.splash h1 {
 		font-size: 37px;
 	}
-	.splash h1 span {
-		font-size: 44px;
-	}
-	.splash h1 span:nth-child(2) {
-		font-size: 50px;
-	}
 	.location-input	{
 		width: 50%;
 		margin-right: 27%;
@@ -1219,7 +1235,7 @@ body.night #map.expand {
 	}
 	.page-wrap {
 		padding: 20px;
-	}	
+	}
 	.wrap-one {
 		height: 96vh;
 	}
@@ -1271,12 +1287,6 @@ body.night #map.expand {
 @media only screen and (min-width: 1024px) {
 	.splash h1 {
 		font-size: 40px;
-	}
-	.splash h1 span {
-		font-size: 49px;
-	}
-	.splash h1 span:nth-child(2) {
-		font-size: 53px;
 	}
 	.location-input	{
 		width: 40%;
